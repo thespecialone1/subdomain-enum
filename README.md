@@ -80,6 +80,7 @@ Deploy this application to various cloud platforms:
    - **Root Directory**: `.` (leave empty or use dot for repository root)
    - **Build Command**: `go build -o main cmd/server/main.go`
    - **Start Command**: `./main`
+   - **Publish Directory**: `.` (leave empty or use dot - this is where your binary will be)
    - **Instance Type**: `Free` (or upgrade as needed)
 4. **Advanced Settings** (Optional):
    - **Auto-Deploy**: `Yes` (deploys on every push)
@@ -250,10 +251,19 @@ Most cloud platforms will automatically set `PORT`, but you can customize:
 
 ### Render-Specific Troubleshooting
 
+**Understanding Render Directory Settings:**
+- **Root Directory**: Where Render starts looking for your code (use `.` for repository root)
+- **Publish Directory**: Where your built binary and assets are located after build (use `.` since binary builds to root)
+
 **Root Directory Issues:**
 - **Problem**: "No such file or directory" errors during build
 - **Solution**: Set Root Directory to `.` (dot) or leave empty
-- **Explanation**: Render needs access to the entire repository structure
+- **Explanation**: Render needs access to go.mod, cmd/, public/ folders
+
+**Publish Directory Issues:**
+- **Problem**: "Service failed to start" or binary not found
+- **Solution**: Set Publish Directory to `.` (dot) or leave empty
+- **Explanation**: Your binary `main` is built in the root after `go build -o main cmd/server/main.go`
 
 **Build Command Issues:**
 - **Problem**: Build fails with "package not found"
@@ -265,13 +275,14 @@ Most cloud platforms will automatically set `PORT`, but you can customize:
 - **Solution**: Ensure `public/` directory is in repository root
 - **Check**: Verify in Render logs that files are copied during build
 
-**Common Render Settings:**
+**Complete Render Settings:**
 ```
 Name: subdomain-enum
 Environment: Go
 Build Command: go build -o main cmd/server/main.go
 Start Command: ./main
-Root Directory: . (or leave empty)
+Root Directory: . (where your source code is)
+Publish Directory: . (where your built binary will be)
 ```
 
 ### Quick Port Fix for Cloud Deployment
