@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Build artifacts
+dist/
+*.exe
+subdomain-enum-*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+misc.txt
+
+# Test files
+*_test.go
+
+# Docker
+Dockerfile
+.dockerignore

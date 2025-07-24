@@ -61,6 +61,197 @@ go run cmd/server/main.go
 go build -o subdomain-enum cmd/server/main.go
 ```
 
+## Cloud Deployment
+
+Deploy this application to various cloud platforms:
+
+### Render.com
+
+1. **Fork/Clone** this repository to your GitHub account
+2. **Connect to Render**:
+   - Go to [render.com](https://render.com) and sign up
+   - Click "New" → "Web Service"
+   - Connect your GitHub repository
+3. **Configuration**:
+   - **Build Command**: `go build -o main cmd/server/main.go`
+   - **Start Command**: `./main`
+   - **Environment**: `Go`
+   - **Go Version**: `1.21` or higher
+4. **Deploy**: Click "Create Web Service"
+
+### Railway.app
+
+1. **Connect Repository**:
+   - Go to [railway.app](https://railway.app) and sign up
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your forked repository
+2. **Configuration** (Railway auto-detects Go):
+   - **Build Command**: `go build -o main cmd/server/main.go`
+   - **Start Command**: `./main`
+3. **Environment Variables** (if needed):
+   - `PORT`: Railway provides this automatically
+4. **Deploy**: Railway will automatically deploy
+
+### Heroku
+
+1. **Install Heroku CLI** and login:
+   ```bash
+   heroku login
+   ```
+
+2. **Create Heroku app**:
+   ```bash
+   heroku create your-app-name
+   ```
+
+3. **Add Go buildpack**:
+   ```bash
+   heroku buildpacks:set heroku/go
+   ```
+
+4. **Create Procfile** in your project root:
+   ```
+   web: ./bin/subdomain-enum
+   ```
+
+5. **Update go.mod for Heroku** (add this to ensure proper module path):
+   ```bash
+   go mod tidy
+   ```
+
+6. **Deploy**:
+   ```bash
+   git add .
+   git commit -m "Add Heroku deployment config"
+   git push heroku master
+   ```
+
+### Google Cloud Run
+
+1. **Create Dockerfile** in project root:
+   ```dockerfile
+   # Build stage
+   FROM golang:1.21-alpine AS builder
+   WORKDIR /app
+   COPY go.mod go.sum ./
+   RUN go mod download
+   COPY . .
+   RUN go build -o main cmd/server/main.go
+   
+   # Runtime stage
+   FROM alpine:latest
+   RUN apk --no-cache add ca-certificates
+   WORKDIR /root/
+   COPY --from=builder /app/main .
+   COPY --from=builder /app/public ./public
+   EXPOSE 8080
+   CMD ["./main"]
+   ```
+
+2. **Deploy to Cloud Run**:
+   ```bash
+   gcloud run deploy subdomain-enum \
+     --source . \
+     --platform managed \
+     --region us-central1 \
+     --allow-unauthenticated
+   ```
+
+### DigitalOcean App Platform
+
+1. **Connect Repository**:
+   - Go to DigitalOcean → Apps → Create App
+   - Connect your GitHub repository
+
+2. **App Spec Configuration**:
+   ```yaml
+   name: subdomain-enum
+   services:
+   - name: web
+     source_dir: /
+     github:
+       repo: your-username/subdomain-enum
+       branch: master
+     run_command: ./main
+     build_command: go build -o main cmd/server/main.go
+     environment_slug: go
+     instance_count: 1
+     instance_size_slug: basic-xxs
+     http_port: 8080
+   ```
+
+### Fly.io
+
+1. **Install Fly CLI** and login:
+   ```bash
+   flyctl auth login
+   ```
+
+2. **Initialize Fly app**:
+   ```bash
+   flyctl launch
+   ```
+
+3. **Update fly.toml** if needed:
+   ```toml
+   [build]
+     builder = "paketobuildpacks/builder:base"
+   
+   [[services]]
+     http_checks = []
+     internal_port = 8080
+     processes = ["app"]
+     protocol = "tcp"
+     script_checks = []
+   
+     [[services.ports]]
+       force_https = true
+       handlers = ["http"]
+       port = 80
+   
+     [[services.ports]]
+       handlers = ["tls", "http"]
+       port = 443
+   ```
+
+4. **Deploy**:
+   ```bash
+   flyctl deploy
+   ```
+
+### Environment Variables for Cloud Deployment
+
+Most cloud platforms will automatically set `PORT`, but you can customize:
+
+- `PORT`: The port your app listens on (default: 8080)
+- `GO_ENV`: Set to `production` for production builds
+
+### Important Notes for Cloud Deployment
+
+1. **Port Configuration**: Most cloud platforms expect your app to listen on the port specified by the `PORT` environment variable. You may need to modify the main.go to use `os.Getenv("PORT")` instead of hardcoded `:8080`.
+
+2. **Static Files**: Ensure the `public/` directory is included in your deployment.
+
+3. **Build Optimization**: For production, consider using build flags:
+   ```bash
+   go build -ldflags="-s -w" -o main cmd/server/main.go
+   ```
+
+4. **Health Checks**: Some platforms require health check endpoints. Consider adding a `/health` endpoint.
+
+### Quick Port Fix for Cloud Deployment
+
+To make your app work with cloud platforms, update the main.go server startup:
+
+```go
+port := os.Getenv("PORT")
+if port == "" {
+    port = "8080"
+}
+log.Printf("Listening on port %s...", port)
+log.Fatal(http.ListenAndServe(":"+port, mux))
+```
+
 ### Cross-compilation for Different Platforms
 
 ```bash

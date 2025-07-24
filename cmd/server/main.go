@@ -10,6 +10,7 @@ import (
     "log"
     "net/http"
     "net/url"
+    "os"
     "regexp"
     "strings"
     "sync"
@@ -59,8 +60,12 @@ func main() {
     // Abort handler
     mux.HandleFunc("/api/abort", abortHandler)
 
-    log.Println("Listening on http://localhost:8080 …")
-    log.Fatal(http.ListenAndServe(":8080", mux))
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+    log.Printf("Listening on port %s…", port)
+    log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
 func sseHeader(w http.ResponseWriter) {
