@@ -46,5 +46,9 @@ Desktop.ini
 /dist/
 /build/
 
+# Compiled binaries
+*.exe
+subdomain-enum-*
+
 # Custom ignore - misc.txt
 misc.txt
