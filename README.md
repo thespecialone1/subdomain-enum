@@ -73,11 +73,20 @@ Deploy this application to various cloud platforms:
    - Click "New" → "Web Service"
    - Connect your GitHub repository
 3. **Configuration**:
+   - **Name**: `subdomain-enum` (or your preferred name)
+   - **Environment**: `Go`
+   - **Region**: Choose closest to your users
+   - **Branch**: `master` (or `main`)
+   - **Root Directory**: `.` (leave empty or use dot for repository root)
    - **Build Command**: `go build -o main cmd/server/main.go`
    - **Start Command**: `./main`
-   - **Environment**: `Go`
-   - **Go Version**: `1.21` or higher
-4. **Deploy**: Click "Create Web Service"
+   - **Instance Type**: `Free` (or upgrade as needed)
+4. **Advanced Settings** (Optional):
+   - **Auto-Deploy**: `Yes` (deploys on every push)
+   - **Environment Variables**: None required (PORT is auto-set)
+5. **Deploy**: Click "Create Web Service"
+
+**Important**: Since your main.go is in `cmd/server/`, make sure the build command points to the correct path. The root directory should be `.` (repository root) so Render can access all files.
 
 ### Railway.app
 
@@ -238,6 +247,32 @@ Most cloud platforms will automatically set `PORT`, but you can customize:
    ```
 
 4. **Health Checks**: Some platforms require health check endpoints. Consider adding a `/health` endpoint.
+
+### Render-Specific Troubleshooting
+
+**Root Directory Issues:**
+- **Problem**: "No such file or directory" errors during build
+- **Solution**: Set Root Directory to `.` (dot) or leave empty
+- **Explanation**: Render needs access to the entire repository structure
+
+**Build Command Issues:**
+- **Problem**: Build fails with "package not found"
+- **Solution**: Use full path: `go build -o main cmd/server/main.go`
+- **Alternative**: If issues persist, try: `go build -o main ./cmd/server`
+
+**Static Files Not Loading:**
+- **Problem**: Web interface shows "file not found"
+- **Solution**: Ensure `public/` directory is in repository root
+- **Check**: Verify in Render logs that files are copied during build
+
+**Common Render Settings:**
+```
+Name: subdomain-enum
+Environment: Go
+Build Command: go build -o main cmd/server/main.go
+Start Command: ./main
+Root Directory: . (or leave empty)
+```
 
 ### Quick Port Fix for Cloud Deployment
 
