@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subdomain Enumeration Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .control-panel {
+            background: #111;
+            padding: 2rem;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .input-group label {
+            color: #ccc;
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        input[type="text"] {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            color: #fff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            min-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 0 3px rgba(85, 85, 85, 0.3);
+        }
+
+        .btn {
+            background: #222;
+            border: 2px solid #444;
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #333;
+            border-color: #666;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.primary {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .btn.primary:hover {
+            background: #f0f0f0;
+            border-color: #f0f0f0;
+        }
+
+        .btn.danger {
+            background: #333;
+            border-color: #555;
+        }
+
+        .btn.danger:hover {
+            background: #444;
+            border-color: #666;
+        }
+
+        .btn.copy {
+            background: #1a1a1a;
+            border-color: #333;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn.copy:hover {
+            background: #2a2a2a;
+            border-color: #555;
+        }
+
+        .btn.remove-duplicates {
+            background: #1a1a2a;
+            border-color: #404;
+            color: #ddd;
+            display: none;
+        }
+
+        .btn.remove-duplicates:hover {
+            background: #2a2a3a;
+            border-color: #606;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-bar {
+            background: #0f0f0f;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ccc;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.active {
+            background: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 60vh;
+        }
+
+        .source-panel {
+            background: #0d0d0d;
+            border-right: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .source-panel:last-child {
+            border-right: none;
+        }
+
+        .source-header {
+            background: #1a1a1a;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .source-title-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .source-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .source-counter {
+            background: #333;
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            max-height: 500px;
+        }
+
+        .result-item {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background: #151515;
+            border-color: #333;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-host {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.3rem;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-arrow {
+            color: #666;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            color: #fff;
+        }
+
+        .result-details {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+            flex-wrap: wrap;
+        }
+
+        .result-status {
+            background: #222;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .result-title {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #111;
+            margin: 5% auto;
+            padding: 0;
+            border: 2px solid #333;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            word-break: break-all;
+        }
+
+        .close {
+            color: #666;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-row {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-size: 1rem;
+            padding: 0.8rem;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        .detail-value.error {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .detail-value.status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .detail-value.status.success {
+            background: #2a2a2a;
+            color: #4ade80;
+        }
+
+        .detail-value.status.error {
+            background: #2a1a1a;
+            color: #ff6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .source-panel {
+                border-right: none;
+                border-bottom: 1px solid #222;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            input[type="text"] {
+                min-width: 250px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        /* Custom scrollbar */
+        .results-container::-webkit-scrollbar,
+        .modal-content::-webkit-scrollbar,
+        .detail-value.error::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-container::-webkit-scrollbar-track,
+        .modal-content::-webkit-scrollbar-track,
+        .detail-value.error::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .results-container::-webkit-scrollbar-thumb,
+        .modal-content::-webkit-scrollbar-thumb,
+        .detail-value.error::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb:hover,
+        .modal-content::-webkit-scrollbar-thumb:hover,
+        .detail-value.error::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #222;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #444;
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SUBDOMAIN ENUMERATION</h1>
+        <p>Advanced reconnaissance & discovery tool</p>
+    </div>
+
+    <div class="control-panel">
+        <div class="input-group">
+            <label for="domain">Target:</label>
+            <input type="text" id="domain" placeholder="example.com" value="example.com">
+        </div>
+        <button id="startBtn" class="btn primary">Start Scan</button>
+        <button id="stopBtn" class="btn danger" disabled>Stop Scan</button>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-indicator" id="waybackIndicator"></div>
+            <span>Wayback Machine</span>
+        </div>
+        <div class="status-item">
+            <div class="status-indicator" id="crtshIndicator"></div>
+            <span>crt.sh</span>
+        </div>
+        <div class="status-item">
+            <span id="totalCounter">Total: 0 hosts</span>
+        </div>
+        <div class="status-item">
+            <span id="scanTime">Elapsed: 00:00</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">Wayback Machine</span>
+                    <span class="source-counter" id="waybackCounter">0</span>
+                </div>
+                <button class="btn copy" id="copyWayback">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                    Copy All
+                </button>
+                <button class="btn remove-duplicates" id="removeDuplicatesWayback">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Remove Duplicates
+                </button>
+            </div>
+            <div class="results-container" id="waybackResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">crt.sh</span>
+                    <span class="source-counter" id="crtshCounter">0</span>
+                </div>
+                <button class="btn copy" id="copyCrtsh">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                    Copy All
+                </button>
+                <button class="btn remove-duplicates" id="removeDuplicatesCrtsh">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Remove Duplicates
+                </button>
+            </div>
+            <div class="results-container" id="crtshResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for subdomain details -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Subdomain Details</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <div class="detail-label">Host</div>
+                    <div class="detail-value" id="modalHost"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Tried URL</div>
+                    <div class="detail-value" id="modalTriedURL"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status Code</div>
+                    <div class="detail-value status" id="modalStatus"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Title</div>
+                    <div class="detail-value" id="modalTitleValue"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Error</div>
+                    <div class="detail-value error" id="modalError"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SubdomainScanner {
+            constructor() {
+                this.waybackEventSource = null;
+                this.crtshEventSource = null;
+                this.isScanning = false;
+                this.startTime = null;
+                this.timerInterval = null;
+                this.counters = {
+                    wayback: 0,
+                    crtsh: 0,
+                    total: 0
+                };
+                this.results = {
+                    wayback: [],
+                    crtsh: []
+                };
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startScan());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopScan());
+                
+                // Copy buttons
+                document.getElementById('copyWayback').addEventListener('click', () => this.copyResults('wayback'));
+                document.getElementById('copyCrtsh').addEventListener('click', () => this.copyResults('crtsh'));
+                
+                // Remove duplicates buttons
+                document.getElementById('removeDuplicatesWayback').addEventListener('click', () => this.removeDuplicates('wayback'));
+                document.getElementById('removeDuplicatesCrtsh').addEventListener('click', () => this.removeDuplicates('crtsh'));
+                
+                // Modal events
+                document.querySelector('.close').addEventListener('click', () => this.closeModal());
+                document.getElementById('detailModal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('detailModal')) {
+                        this.closeModal();
+                    }
+                });
+                
+                // Allow enter key to start scan
+                document.getElementById('domain').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isScanning) {
+                        this.startScan();
+                    }
+                });
+            }
+
+            startScan() {
+                const domain = document.getElementById('domain').value.trim();
+                if (!domain) {
+                    alert('Please enter a domain name');
+                    return;
+                }
+
+                // Stop any existing scan first
+                if (this.isScanning) {
+                    this.stopScan();
+                    // Wait a bit before starting new scan
+                    setTimeout(() => this.startScan(), 1000);
+                    return;
+                }
+
+                this.isScanning = true;
+                this.startTime = Date.now();
+                this.resetUI();
+                this.updateButtons();
+                this.startTimer();
+
+                // Start SSE connections
+                this.startWaybackStream(domain);
+                this.startCrtshStream(domain);
+            }
+
+            stopScan() {
+                this.isScanning = false;
+                this.updateButtons();
+                this.stopStreams();
+                this.stopTimer();
+                
+                // Show remove duplicates buttons after stopping
+                document.getElementById('removeDuplicatesWayback').style.display = 'flex';
+                document.getElementById('removeDuplicatesCrtsh').style.display = 'flex';
+                
+                // Hit abort endpoint with target parameter
+                const domain = document.getElementById('domain').value.trim();
+                fetch(`/api/abort?target=${encodeURIComponent(domain)}`, { method: 'POST' }).catch(console.error);
+            }
+
+            resetUI() {
+                this.counters = { wayback: 0, crtsh: 0, total: 0 };
+                this.results = { wayback: [], crtsh: [] };
+                this.updateCounters();
+                
+                // Clear results
+                document.getElementById('waybackResults').innerHTML = '';
+                document.getElementById('crtshResults').innerHTML = '';
+                
+                // Reset indicators
+                document.getElementById('waybackIndicator').classList.remove('active');
+                document.getElementById('crtshIndicator').classList.remove('active');
+                
+                // Hide remove duplicates buttons when starting new scan
+                document.getElementById('removeDuplicatesWayback').style.display = 'none';
+                document.getElementById('removeDuplicatesCrtsh').style.display = 'none';
+            }
+
+            startWaybackStream(domain) {
+                this.waybackEventSource = new EventSource(`/api/wayback/stream?target=${encodeURIComponent(domain)}`);
+                document.getElementById('waybackIndicator').classList.add('active');
+                
+                this.waybackEventSource.onmessage = (event) => {
+                    const host = event.data.trim();
+                    if (host) {
+                        // Start probing the host in the background
+                        this.probeHost(host, 'wayback');
+                    }
+                };
+                
+                this.waybackEventSource.onerror = () => {
+                    document.getElementById('waybackIndicator').classList.remove('active');
+                };
+                
+                this.waybackEventSource.onopen = () => {
+                    console.log('Wayback stream connected');
+                };
+            }
+
+            startCrtshStream(domain) {
+                this.crtshEventSource = new EventSource(`/api/crtsh/stream?target=${encodeURIComponent(domain)}`);
+                document.getElementById('crtshIndicator').classList.add('active');
+                
+                this.crtshEventSource.onmessage = (event) => {
+                    const host = event.data.trim();
+                    if (host) {
+                        // Start probing the host in the background
+                        this.probeHost(host, 'crtsh');
+                    }
+                };
+                
+                this.crtshEventSource.onerror = () => {
+                    document.getElementById('crtshIndicator').classList.remove('active');
+                };
+                
+                this.crtshEventSource.onopen = () => {
+                    console.log('crt.sh stream connected');
+                };
+            }
+
+            stopStreams() {
+                if (this.waybackEventSource) {
+                    this.waybackEventSource.close();
+                    this.waybackEventSource = null;
+                    document.getElementById('waybackIndicator').classList.remove('active');
+                }
+                
+                if (this.crtshEventSource) {
+                    this.crtshEventSource.close();
+                    this.crtshEventSource = null;
+                    document.getElementById('crtshIndicator').classList.remove('active');
+                }
+            }
+
+            addResult(source, data) {
+                const container = document.getElementById(`${source}Results`);
+                
+                // Remove empty state if it exists
+                const emptyState = container.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+
+                // Check for duplicates
+                const existingResult = this.results[source].find(r => r.Host === data.Host);
+                if (existingResult) {
+                    return; // Skip duplicates
+                }
+
+                // Add to results array
+                this.results[source].push(data);
+                
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.setAttribute('data-host', data.Host);
+                
+                const status = data.Status || 'Probing...';
+                const title = data.Title || 'Subdomain discovered';
+                
+                resultItem.innerHTML = `
+                    <div class="result-host">
+                        ${data.Host}
+                        <a href="https://${data.Host}" target="_blank" class="nav-arrow" title="Visit site">↗</a>
+                    </div>
+                    <div class="result-details">
+                        <span class="result-status">${status}</span>
+                        <span class="result-title" title="${title}">${title}</span>
+                    </div>
+                `;
+                
+                // Add click listener for modal
+                resultItem.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('nav-arrow')) return;
+                    this.showModal(data);
+                });
+                
+                container.insertBefore(resultItem, container.firstChild);
+                
+                // Update counters
+                this.counters[source]++;
+                this.counters.total++;
+                this.updateCounters();
+                
+                // Scroll to top to show new result  
+                container.scrollTop = 0;
+            }
+
+            updateCounters() {
+                document.getElementById('waybackCounter').textContent = this.counters.wayback;
+                document.getElementById('crtshCounter').textContent = this.counters.crtsh;
+                document.getElementById('totalCounter').textContent = `Total: ${this.counters.total} hosts`;
+            }
+
+            updateButtons() {
+                document.getElementById('startBtn').disabled = this.isScanning;
+                document.getElementById('stopBtn').disabled = !this.isScanning;
+                document.getElementById('domain').disabled = this.isScanning;
+            }
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    if (this.startTime) {
+                        const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                        const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                        const seconds = (elapsed % 60).toString().padStart(2, '0');
+                        document.getElementById('scanTime').textContent = `Elapsed: ${minutes}:${seconds}`;
+                    }
+                }, 1000);
+            }
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            }
+
+            copyResults(source) {
+                const hosts = this.results[source].map(r => r.Host).join('\n');
+                if (hosts) {
+                    navigator.clipboard.writeText(hosts).then(() => {
+                        this.showCopyNotification(`Copied ${this.results[source].length} ${source} hosts`);
+                    }).catch(err => {
+                        console.error('Failed to copy:', err);
+                    });
+                } else {
+                    this.showCopyNotification('No hosts to copy');
+                }
+            }
+
+            showCopyNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'copy-notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+
+            showModal(data) {
+                document.getElementById('modalTitle').textContent = data.Host;
+                document.getElementById('modalHost').textContent = data.Host;
+                document.getElementById('modalTriedURL').textContent = data.TriedURL || 'Not probed yet';
+                
+                const statusEl = document.getElementById('modalStatus');
+                statusEl.textContent = data.Status || 'Probing...';
+                statusEl.className = 'detail-value status ' + (data.Status && data.Status !== 'Probing...' ? 'success' : 'error');
+                
+                document.getElementById('modalTitleValue').textContent = data.Title || 'No title available';
+                
+                const errorEl = document.getElementById('modalError');
+                if (data.Err && data.Err.trim()) {
+                    errorEl.textContent = data.Err;
+                    errorEl.style.display = 'block';
+                } else {
+                    errorEl.textContent = 'No errors';
+                    errorEl.style.display = 'block';
+                }
+                
+                document.getElementById('detailModal').style.display = 'block';
+            }
+
+            closeModal() {
+                document.getElementById('detailModal').style.display = 'none';
+            }
+
+            removeDuplicates(source) {
+                const otherSource = source === 'wayback' ? 'crtsh' : 'wayback';
+                const currentResults = this.results[source];
+                const otherResults = this.results[otherSource];
+                
+                // Find hosts that exist in both sources
+                const otherHosts = new Set(otherResults.map(r => r.Host));
+                const duplicates = currentResults.filter(r => otherHosts.has(r.Host));
+                
+                if (duplicates.length === 0) {
+                    this.showCopyNotification(`No duplicates found in ${source}`);
+                    return;
+                }
+                
+                // Remove duplicates from current source
+                this.results[source] = currentResults.filter(r => !otherHosts.has(r.Host));
+                
+                // Update UI
+                const container = document.getElementById(`${source}Results`);
+                duplicates.forEach(duplicate => {
+                    const item = container.querySelector(`[data-host="${duplicate.Host}"]`);
+                    if (item) {
+                        item.remove();
+                    }
+                });
+                
+                // Update counters
+                this.counters[source] -= duplicates.length;
+                this.counters.total -= duplicates.length;
+                this.updateCounters();
+                
+                this.showCopyNotification(`Removed ${duplicates.length} duplicates from ${source}`);
+            }
+
+            async probeHost(host, source) {
+                // First add the host with "Probing..." status
+                const initialResult = { 
+                    Host: host, 
+                    Status: 'Probing...', 
+                    Title: 'Subdomain discovered',
+                    TriedURL: '',
+                    Err: ''
+                };
+                this.addResult(source, initialResult);
+
+                // Try HTTPS first, then HTTP
+                const protocols = ['https', 'http'];
+                let finalResult = { ...initialResult };
+
+                for (const protocol of protocols) {
+                    const url = `${protocol}://${host}`;
+                    finalResult.TriedURL = url;
+
+                    try {
+                        const response = await fetch(`/api/probe?url=${encodeURIComponent(url)}`);
+                        const probeData = await response.json();
+                        
+                        if (probeData.status && probeData.status !== '0') {
+                            finalResult.Status = probeData.status;
+                            finalResult.Title = probeData.title || 'No title';
+                            finalResult.Err = probeData.error || '';
+                            break; // Success, stop trying other protocols
+                        }
+                    } catch (error) {
+                        finalResult.Err = `Probe failed: ${error.message}`;
+                    }
+                }
+
+                // If both protocols failed, mark as failed
+                if (finalResult.Status === 'Probing...') {
+                    finalResult.Status = 'Failed';
+                    finalResult.Title = 'Connection failed';
+                    finalResult.Err = finalResult.Err || 'No response from host';
+                }
+
+                // Update the result with probing information
+                this.updateResult(source, host, finalResult);
+            }
+
+            updateResult(source, host, newData) {
+                // Update in results array
+                const resultIndex = this.results[source].findIndex(r => r.Host === host);
+                if (resultIndex !== -1) {
+                    this.results[source][resultIndex] = newData;
+                }
+
+                // Update in DOM
+                const container = document.getElementById(`${source}Results`);
+                const existingItem = container.querySelector(`[data-host="${host}"]`);
+                if (existingItem) {
+                    const status = newData.Status || 'Unknown';
+                    const title = newData.Title || 'No title';
+                    
+                    existingItem.innerHTML = `
+                        <div class="result-host">
+                            ${newData.Host}
+                            <a href="${newData.TriedURL || 'https://' + newData.Host}" target="_blank" class="nav-arrow" title="Visit site">↗</a>
+                        </div>
+                        <div class="result-details">
+                            <span class="result-status">${status}</span>
+                            <span class="result-title" title="${title}">${title}</span>
+                        </div>
+                    `;
+                    
+                    // Re-add click listener for modal
+                    existingItem.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('nav-arrow')) return;
+                        this.showModal(newData);
+                    });
+                }
+            }
+        }
+
+        // Initialize the scanner when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SubdomainScanner();
+        });
+    </script>
+</body>
+</html>
