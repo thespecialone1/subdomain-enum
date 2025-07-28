@@ -2,10 +2,8 @@
 # Multi-stage build for optimal image size and security
 
 ARG GO_VERSION=1.24
-ARG ALPINE_VERSION=3.19
-
 # Build stage
-FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS builder
+FROM golang:${GO_VERSION}-alpine AS builder
 
 # Build arguments
 ARG VERSION=2.2.0
