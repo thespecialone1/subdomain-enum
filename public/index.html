@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subdomain Enumeration Tool</title>
+    <title>Advanced Subdomain Enumeration Tool</title>
     <style>
         * {
             margin: 0;
@@ -50,11 +50,57 @@
             background: #111;
             padding: 2rem;
             border-bottom: 1px solid #333;
+        }
+
+        .main-controls {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .source-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .source-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1a1a1a;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .source-toggle:hover {
+            border-color: #555;
+            background: #222;
+        }
+
+        .source-toggle.active {
+            border-color: #666;
+            background: #2a2a2a;
+        }
+
+        .source-toggle input[type="checkbox"] {
+            margin: 0;
+            transform: scale(1.2);
+        }
+
+        .source-toggle label {
+            color: #ccc;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
         }
 
         .input-group {
@@ -149,18 +195,6 @@
             border-color: #555;
         }
 
-        .btn.remove-duplicates {
-            background: #1a1a2a;
-            border-color: #404;
-            color: #ddd;
-            display: none;
-        }
-
-        .btn.remove-duplicates:hover {
-            background: #2a2a3a;
-            border-color: #606;
-        }
-
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -176,6 +210,12 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+        }
+
+        .status-group {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
         }
 
         .status-item {
@@ -194,14 +234,18 @@
         }
 
         .status-indicator.active {
-            background: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            background: #4ade80;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        }
+
+        .status-indicator.finished {
+            background: #666;
         }
 
         .main-content {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 0;
             min-height: 60vh;
         }
@@ -245,6 +289,11 @@
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 500;
+        }
+
+        .source-actions {
+            display: flex;
+            gap: 0.5rem;
         }
 
         .results-container {
@@ -458,6 +507,74 @@
             color: #ff6b6b;
         }
 
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #222;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #444;
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .progress-bar {
+            background: #1a1a1a;
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .stats-summary {
+            background: #0f0f0f;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4ade80;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -468,7 +585,7 @@
                 border-bottom: 1px solid #222;
             }
             
-            .control-panel {
+            .main-controls, .source-controls {
                 flex-direction: column;
                 gap: 1rem;
             }
@@ -480,6 +597,14 @@
             .modal-content {
                 width: 95%;
                 margin: 10% auto;
+            }
+
+            .status-group {
+                gap: 1rem;
+            }
+
+            .stats-summary {
+                gap: 2rem;
             }
         }
 
@@ -508,61 +633,96 @@
         .detail-value.error::-webkit-scrollbar-thumb:hover {
             background: #444;
         }
-
-        .copy-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #222;
-            color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            border: 1px solid #444;
-            z-index: 1001;
-            animation: slideInRight 0.3s ease;
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>SUBDOMAIN ENUMERATION</h1>
-        <p>Advanced reconnaissance & discovery tool</p>
+        <h1>ADVANCED SUBDOMAIN ENUMERATION</h1>
+        <p>Multi-source reconnaissance & discovery platform</p>
     </div>
 
     <div class="control-panel">
-        <div class="input-group">
-            <label for="domain">Target:</label>
-            <input type="text" id="domain" placeholder="example.com" value="example.com">
+        <div class="main-controls">
+            <div class="input-group">
+                <label for="domain">Target:</label>
+                <input type="text" id="domain" placeholder="example.com" value="example.com">
+            </div>
+            <button id="startBtn" class="btn primary">Start Scan</button>
+            <button id="stopBtn" class="btn danger" disabled>Stop Scan</button>
         </div>
-        <button id="startBtn" class="btn primary">Start Scan</button>
-        <button id="stopBtn" class="btn danger" disabled>Stop Scan</button>
+        
+        <div class="source-controls">
+            <div class="source-toggle active">
+                <input type="checkbox" id="wayback-toggle" checked>
+                <label for="wayback-toggle">Wayback Machine</label>
+            </div>
+            <div class="source-toggle active">
+                <input type="checkbox" id="crtsh-toggle" checked>
+                <label for="crtsh-toggle">Certificate Transparency</label>
+            </div>
+            <div class="source-toggle active">
+                <input type="checkbox" id="dns-toggle" checked>
+                <label for="dns-toggle">DNS Brute Force</label>
+            </div>
+            <div class="source-toggle">
+                <input type="checkbox" id="search-toggle">
+                <label for="search-toggle">Search Engine Scraping</label>
+            </div>
+            <div class="source-toggle">
+                <input type="checkbox" id="permute-toggle">
+                <label for="permute-toggle">Permutation Generation</label>
+            </div>
+            <div class="source-toggle">
+                <input type="checkbox" id="zone-toggle">
+                <label for="zone-toggle">Zone Transfer</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-summary">
+        <div class="stat-item">
+            <span class="stat-number" id="totalCount">0</span>
+            <span class="stat-label">Total Found</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="activeCount">0</span>
+            <span class="stat-label">Active Sources</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="scanTime">00:00</span>
+            <span class="stat-label">Elapsed</span>
+        </div>
     </div>
 
     <div class="status-bar">
-        <div class="status-item">
-            <div class="status-indicator" id="waybackIndicator"></div>
-            <span>Wayback Machine</span>
+        <div class="status-group">
+            <div class="status-item">
+                <div class="status-indicator" id="waybackIndicator"></div>
+                <span>Wayback Machine</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="crtshIndicator"></div>
+                <span>Certificate Transparency</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="dnsIndicator"></div>
+                <span>DNS Brute Force</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="searchIndicator"></div>
+                <span>Search Engine</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="permuteIndicator"></div>
+                <span>Permutation</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="zoneIndicator"></div>
+                <span>Zone Transfer</span>
+            </div>
         </div>
         <div class="status-item">
-            <div class="status-indicator" id="crtshIndicator"></div>
-            <span>crt.sh</span>
-        </div>
-        <div class="status-item">
-            <span id="totalCounter">Total: 0 hosts</span>
-        </div>
-        <div class="status-item">
-            <span id="scanTime">Elapsed: 00:00</span>
+            <span id="statusText">Ready to scan</span>
         </div>
     </div>
 
@@ -573,18 +733,9 @@
                     <span class="source-title">Wayback Machine</span>
                     <span class="source-counter" id="waybackCounter">0</span>
                 </div>
-                <button class="btn copy" id="copyWayback">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                    </svg>
-                    Copy All
-                </button>
-                <button class="btn remove-duplicates" id="removeDuplicatesWayback">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                    </svg>
-                    Remove Duplicates
-                </button>
+                <div class="source-actions">
+                    <button class="btn copy" id="copyWayback">Copy All</button>
+                </div>
             </div>
             <div class="results-container" id="waybackResults">
                 <div class="empty-state">
@@ -599,23 +750,94 @@
         <div class="source-panel">
             <div class="source-header">
                 <div class="source-title-section">
-                    <span class="source-title">crt.sh</span>
+                    <span class="source-title">Certificate Transparency</span>
                     <span class="source-counter" id="crtshCounter">0</span>
                 </div>
-                <button class="btn copy" id="copyCrtsh">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                    </svg>
-                    Copy All
-                </button>
-                <button class="btn remove-duplicates" id="removeDuplicatesCrtsh">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                    </svg>
-                    Remove Duplicates
-                </button>
+                <div class="source-actions">
+                    <button class="btn copy" id="copyCrtsh">Copy All</button>
+                </div>
             </div>
             <div class="results-container" id="crtshResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">DNS Brute Force</span>
+                    <span class="source-counter" id="dnsCounter">0</span>
+                </div>
+                <div class="source-actions">
+                    <button class="btn copy" id="copyDns">Copy All</button>
+                </div>
+            </div>
+            <div class="results-container" id="dnsResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">Search Engine</span>
+                    <span class="source-counter" id="searchCounter">0</span>
+                </div>
+                <div class="source-actions">
+                    <button class="btn copy" id="copySearch">Copy All</button>
+                </div>
+            </div>
+            <div class="results-container" id="searchResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">Permutation</span>
+                    <span class="source-counter" id="permuteCounter">0</span>
+                </div>
+                <div class="source-actions">
+                    <button class="btn copy" id="copyPermute">Copy All</button>
+                </div>
+            </div>
+            <div class="results-container" id="permuteResults">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span>Waiting for scan to start...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="source-panel">
+            <div class="source-header">
+                <div class="source-title-section">
+                    <span class="source-title">Zone Transfer</span>
+                    <span class="source-counter" id="zoneCounter">0</span>
+                </div>
+                <div class="source-actions">
+                    <button class="btn copy" id="copyZone">Copy All</button>
+                </div>
+            </div>
+            <div class="results-container" id="zoneResults">
                 <div class="empty-state">
                     <svg fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -639,6 +861,10 @@
                     <div class="detail-value" id="modalHost"></div>
                 </div>
                 <div class="detail-row">
+                    <div class="detail-label">Source</div>
+                    <div class="detail-value" id="modalSource"></div>
+                </div>
+                <div class="detail-row">
                     <div class="detail-label">Tried URL</div>
                     <div class="detail-value" id="modalTriedURL"></div>
                 </div>
@@ -659,37 +885,59 @@
     </div>
 
     <script>
-        class SubdomainScanner {
+        class AdvancedSubdomainScanner {
             constructor() {
-                this.waybackEventSource = null;
-                this.crtshEventSource = null;
+                this.eventSources = {};
                 this.isScanning = false;
                 this.startTime = null;
                 this.timerInterval = null;
                 this.counters = {
                     wayback: 0,
                     crtsh: 0,
+                    dns: 0,
+                    search: 0,
+                    permute: 0,
+                    zone: 0,
                     total: 0
                 };
                 this.results = {
                     wayback: [],
-                    crtsh: []
+                    crtsh: [],
+                    dns: [],
+                    search: [],
+                    permute: [],
+                    zone: []
                 };
+                this.activeSources = 0;
                 
                 this.initializeEventListeners();
             }
 
             initializeEventListeners() {
+                // Main controls
                 document.getElementById('startBtn').addEventListener('click', () => this.startScan());
                 document.getElementById('stopBtn').addEventListener('click', () => this.stopScan());
                 
-                // Copy buttons
-                document.getElementById('copyWayback').addEventListener('click', () => this.copyResults('wayback'));
-                document.getElementById('copyCrtsh').addEventListener('click', () => this.copyResults('crtsh'));
+                // Source toggles
+                document.querySelectorAll('.source-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => {
+                        if (e.target.type === 'checkbox') return;
+                        const checkbox = toggle.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                        toggle.classList.toggle('active', checkbox.checked);
+                    });
+                    
+                    const checkbox = toggle.querySelector('input[type="checkbox"]');
+                    checkbox.addEventListener('change', () => {
+                        toggle.classList.toggle('active', checkbox.checked);
+                    });
+                });
                 
-                // Remove duplicates buttons
-                document.getElementById('removeDuplicatesWayback').addEventListener('click', () => this.removeDuplicates('wayback'));
-                document.getElementById('removeDuplicatesCrtsh').addEventListener('click', () => this.removeDuplicates('crtsh'));
+                // Copy buttons
+                const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
+                sources.forEach(source => {
+                    document.getElementById(`copy${source.charAt(0).toUpperCase() + source.slice(1)}`).addEventListener('click', () => this.copyResults(source));
+                });
                 
                 // Modal events
                 document.querySelector('.close').addEventListener('click', () => this.closeModal());
@@ -710,14 +958,13 @@
             startScan() {
                 const domain = document.getElementById('domain').value.trim();
                 if (!domain) {
-                    alert('Please enter a domain name');
+                    this.showNotification('Please enter a domain name', 'error');
                     return;
                 }
 
                 // Stop any existing scan first
                 if (this.isScanning) {
                     this.stopScan();
-                    // Wait a bit before starting new scan
                     setTimeout(() => this.startScan(), 1000);
                     return;
                 }
@@ -728,9 +975,20 @@
                 this.updateButtons();
                 this.startTimer();
 
-                // Start SSE connections
-                this.startWaybackStream(domain);
-                this.startCrtshStream(domain);
+                // Get enabled sources
+                const enabledSources = this.getEnabledSources();
+                if (enabledSources.length === 0) {
+                    this.showNotification('Please select at least one source', 'error');
+                    this.stopScan();
+                    return;
+                }
+
+                // Start streams for enabled sources
+                enabledSources.forEach(source => {
+                    this.startStream(source, domain);
+                });
+
+                document.getElementById('statusText').textContent = `Scanning ${domain}...`;
             }
 
             stopScan() {
@@ -739,87 +997,101 @@
                 this.stopStreams();
                 this.stopTimer();
                 
-                // Show remove duplicates buttons after stopping
-                document.getElementById('removeDuplicatesWayback').style.display = 'flex';
-                document.getElementById('removeDuplicatesCrtsh').style.display = 'flex';
-                
-                // Hit abort endpoint with target parameter
+                // Hit abort endpoint
                 const domain = document.getElementById('domain').value.trim();
                 fetch(`/api/abort?target=${encodeURIComponent(domain)}`, { method: 'POST' }).catch(console.error);
+                
+                document.getElementById('statusText').textContent = 'Scan stopped';
+            }
+
+            getEnabledSources() {
+                const sources = [];
+                const sourceMap = {
+                    'wayback-toggle': 'wayback',
+                    'crtsh-toggle': 'crtsh',
+                    'dns-toggle': 'dns',
+                    'search-toggle': 'search',
+                    'permute-toggle': 'permute',
+                    'zone-toggle': 'zone'
+                };
+
+                Object.entries(sourceMap).forEach(([toggleId, sourceName]) => {
+                    if (document.getElementById(toggleId).checked) {
+                        sources.push(sourceName);
+                    }
+                });
+
+                return sources;
             }
 
             resetUI() {
-                this.counters = { wayback: 0, crtsh: 0, total: 0 };
-                this.results = { wayback: [], crtsh: [] };
+                this.counters = { wayback: 0, crtsh: 0, dns: 0, search: 0, permute: 0, zone: 0, total: 0 };
+                this.results = { wayback: [], crtsh: [], dns: [], search: [], permute: [], zone: [] };
+                this.activeSources = 0;
                 this.updateCounters();
+                this.updateStats();
                 
                 // Clear results
-                document.getElementById('waybackResults').innerHTML = '';
-                document.getElementById('crtshResults').innerHTML = '';
-                
-                // Reset indicators
-                document.getElementById('waybackIndicator').classList.remove('active');
-                document.getElementById('crtshIndicator').classList.remove('active');
-                
-                // Hide remove duplicates buttons when starting new scan
-                document.getElementById('removeDuplicatesWayback').style.display = 'none';
-                document.getElementById('removeDuplicatesCrtsh').style.display = 'none';
+                const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
+                sources.forEach(source => {
+                    const container = document.getElementById(`${source}Results`);
+                    container.innerHTML = '<div class="empty-state"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><span>Waiting for scan to start...</span></div>';
+                    document.getElementById(`${source}Indicator`).classList.remove('active', 'finished');
+                });
             }
 
-            startWaybackStream(domain) {
-                this.waybackEventSource = new EventSource(`/api/wayback/stream?target=${encodeURIComponent(domain)}`);
-                document.getElementById('waybackIndicator').classList.add('active');
+            startStream(source, domain) {
+                const eventSource = new EventSource(`/api/${source}/stream?target=${encodeURIComponent(domain)}`);
+                this.eventSources[source] = eventSource;
                 
-                this.waybackEventSource.onmessage = (event) => {
+                const indicator = document.getElementById(`${source}Indicator`);
+                indicator.classList.add('active');
+                this.activeSources++;
+                this.updateStats();
+                
+                eventSource.onmessage = (event) => {
                     const host = event.data.trim();
                     if (host) {
-                        // Start probing the host in the background
-                        this.probeHost(host, 'wayback');
+                        this.probeHost(host, source);
                     }
                 };
                 
-                this.waybackEventSource.onerror = () => {
-                    document.getElementById('waybackIndicator').classList.remove('active');
-                };
-                
-                this.waybackEventSource.onopen = () => {
-                    console.log('Wayback stream connected');
-                };
-            }
-
-            startCrtshStream(domain) {
-                this.crtshEventSource = new EventSource(`/api/crtsh/stream?target=${encodeURIComponent(domain)}`);
-                document.getElementById('crtshIndicator').classList.add('active');
-                
-                this.crtshEventSource.onmessage = (event) => {
-                    const host = event.data.trim();
-                    if (host) {
-                        // Start probing the host in the background
-                        this.probeHost(host, 'crtsh');
+                eventSource.onerror = () => {
+                    indicator.classList.remove('active');
+                    indicator.classList.add('finished');
+                    this.activeSources--;
+                    this.updateStats();
+                    
+                    if (this.activeSources === 0 && this.isScanning) {
+                        this.finishScan();
                     }
                 };
                 
-                this.crtshEventSource.onerror = () => {
-                    document.getElementById('crtshIndicator').classList.remove('active');
-                };
-                
-                this.crtshEventSource.onopen = () => {
-                    console.log('crt.sh stream connected');
+                eventSource.onopen = () => {
+                    console.log(`${source} stream connected`);
                 };
             }
 
             stopStreams() {
-                if (this.waybackEventSource) {
-                    this.waybackEventSource.close();
-                    this.waybackEventSource = null;
-                    document.getElementById('waybackIndicator').classList.remove('active');
-                }
-                
-                if (this.crtshEventSource) {
-                    this.crtshEventSource.close();
-                    this.crtshEventSource = null;
-                    document.getElementById('crtshIndicator').classList.remove('active');
-                }
+                Object.entries(this.eventSources).forEach(([source, eventSource]) => {
+                    if (eventSource) {
+                        eventSource.close();
+                        const indicator = document.getElementById(`${source}Indicator`);
+                        indicator.classList.remove('active');
+                        indicator.classList.add('finished');
+                    }
+                });
+                this.eventSources = {};
+                this.activeSources = 0;
+                this.updateStats();
+            }
+
+            finishScan() {
+                this.isScanning = false;
+                this.updateButtons();
+                this.stopTimer();
+                document.getElementById('statusText').textContent = `Scan completed - ${this.counters.total} subdomains discovered`;
+                this.showNotification(`Scan completed! Found ${this.counters.total} subdomains`, 'success');
             }
 
             addResult(source, data) {
@@ -870,21 +1142,33 @@
                 this.counters[source]++;
                 this.counters.total++;
                 this.updateCounters();
+                this.updateStats();
                 
                 // Scroll to top to show new result  
                 container.scrollTop = 0;
             }
 
             updateCounters() {
-                document.getElementById('waybackCounter').textContent = this.counters.wayback;
-                document.getElementById('crtshCounter').textContent = this.counters.crtsh;
-                document.getElementById('totalCounter').textContent = `Total: ${this.counters.total} hosts`;
+                const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
+                sources.forEach(source => {
+                    document.getElementById(`${source}Counter`).textContent = this.counters[source];
+                });
+            }
+
+            updateStats() {
+                document.getElementById('totalCount').textContent = this.counters.total;
+                document.getElementById('activeCount').textContent = this.activeSources;
             }
 
             updateButtons() {
                 document.getElementById('startBtn').disabled = this.isScanning;
                 document.getElementById('stopBtn').disabled = !this.isScanning;
                 document.getElementById('domain').disabled = this.isScanning;
+                
+                // Disable source toggles during scan
+                document.querySelectorAll('.source-toggle input').forEach(input => {
+                    input.disabled = this.isScanning;
+                });
             }
 
             startTimer() {
@@ -893,7 +1177,7 @@
                         const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
                         const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
                         const seconds = (elapsed % 60).toString().padStart(2, '0');
-                        document.getElementById('scanTime').textContent = `Elapsed: ${minutes}:${seconds}`;
+                        document.getElementById('scanTime').textContent = `${minutes}:${seconds}`;
                     }
                 }, 1000);
             }
@@ -909,34 +1193,52 @@
                 const hosts = this.results[source].map(r => r.Host).join('\n');
                 if (hosts) {
                     navigator.clipboard.writeText(hosts).then(() => {
-                        this.showCopyNotification(`Copied ${this.results[source].length} ${source} hosts`);
+                        this.showNotification(`Copied ${this.results[source].length} ${source} hosts`, 'success');
                     }).catch(err => {
                         console.error('Failed to copy:', err);
+                        this.showNotification('Failed to copy to clipboard', 'error');
                     });
                 } else {
-                    this.showCopyNotification('No hosts to copy');
+                    this.showNotification('No hosts to copy', 'warning');
                 }
             }
 
-            showCopyNotification(message) {
+            showNotification(message, type = 'info') {
                 const notification = document.createElement('div');
                 notification.className = 'copy-notification';
                 notification.textContent = message;
+                
+                // Add type-specific styling
+                if (type === 'error') {
+                    notification.style.background = '#2a1a1a';
+                    notification.style.color = '#ff6b6b';
+                    notification.style.borderColor = '#ff6b6b';
+                } else if (type === 'success') {
+                    notification.style.background = '#1a2a1a';
+                    notification.style.color = '#4ade80';
+                    notification.style.borderColor = '#4ade80';
+                } else if (type === 'warning') {
+                    notification.style.background = '#2a2a1a';
+                    notification.style.color = '#fbbf24';
+                    notification.style.borderColor = '#fbbf24';
+                }
+                
                 document.body.appendChild(notification);
                 
                 setTimeout(() => {
                     notification.remove();
-                }, 3000);
+                }, 4000);
             }
 
             showModal(data) {
                 document.getElementById('modalTitle').textContent = data.Host;
                 document.getElementById('modalHost').textContent = data.Host;
+                document.getElementById('modalSource').textContent = data.Source || 'Unknown';
                 document.getElementById('modalTriedURL').textContent = data.TriedURL || 'Not probed yet';
                 
                 const statusEl = document.getElementById('modalStatus');
                 statusEl.textContent = data.Status || 'Probing...';
-                statusEl.className = 'detail-value status ' + (data.Status && data.Status !== 'Probing...' ? 'success' : 'error');
+                statusEl.className = 'detail-value status ' + (data.Status && data.Status !== 'Probing...' && data.Status !== 'Failed' ? 'success' : 'error');
                 
                 document.getElementById('modalTitleValue').textContent = data.Title || 'No title available';
                 
@@ -956,40 +1258,6 @@
                 document.getElementById('detailModal').style.display = 'none';
             }
 
-            removeDuplicates(source) {
-                const otherSource = source === 'wayback' ? 'crtsh' : 'wayback';
-                const currentResults = this.results[source];
-                const otherResults = this.results[otherSource];
-                
-                // Find hosts that exist in both sources
-                const otherHosts = new Set(otherResults.map(r => r.Host));
-                const duplicates = currentResults.filter(r => otherHosts.has(r.Host));
-                
-                if (duplicates.length === 0) {
-                    this.showCopyNotification(`No duplicates found in ${source}`);
-                    return;
-                }
-                
-                // Remove duplicates from current source
-                this.results[source] = currentResults.filter(r => !otherHosts.has(r.Host));
-                
-                // Update UI
-                const container = document.getElementById(`${source}Results`);
-                duplicates.forEach(duplicate => {
-                    const item = container.querySelector(`[data-host="${duplicate.Host}"]`);
-                    if (item) {
-                        item.remove();
-                    }
-                });
-                
-                // Update counters
-                this.counters[source] -= duplicates.length;
-                this.counters.total -= duplicates.length;
-                this.updateCounters();
-                
-                this.showCopyNotification(`Removed ${duplicates.length} duplicates from ${source}`);
-            }
-
             async probeHost(host, source) {
                 // First add the host with "Probing..." status
                 const initialResult = { 
@@ -997,7 +1265,8 @@
                     Status: 'Probing...', 
                     Title: 'Subdomain discovered',
                     TriedURL: '',
-                    Err: ''
+                    Err: '',
+                    Source: source
                 };
                 this.addResult(source, initialResult);
 
@@ -1071,7 +1340,7 @@
 
         // Initialize the scanner when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new SubdomainScanner();
+            new AdvancedSubdomainScanner();
         });
     </script>
 </body>
