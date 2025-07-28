@@ -1,6 +1,6 @@
 # 🚀 Advanced Subdomain Enumeration Tool v2.2
 
-[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go)](https://golang.org/)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go)](https://golang.org/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/thespecialone1/subdomain-enum?style=for-the-badge)](https://github.com/thespecialone1/subdomain-enum/releases)
@@ -102,7 +102,7 @@ Expand-Archive subdomain-enum.zip
 ### Option 3: Build from Source
 
 ```bash
-# Prerequisites: Go 1.21+, Git
+# Prerequisites: Go 1.24+, Git
 git clone https://github.com/thespecialone1/subdomain-enum.git
 cd subdomain-enum
 

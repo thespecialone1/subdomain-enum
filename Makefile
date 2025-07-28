@@ -8,7 +8,7 @@ GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
 
 # Go build variables
-GO_VERSION := 1.21
+GO_VERSION := 1.24
 BINARY_NAME := subdomain-enum
 MAIN_PATH := cmd/server/main.go
 DIST_DIR := dist
