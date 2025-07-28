@@ -317,7 +317,6 @@ func main() {
 		showVersion   = flag.Bool("version", false, "Show version information")
 		showHelp      = flag.Bool("help", false, "Show help information")
 		healthCheck   = flag.Bool("health-check", false, "Perform health check and exit")
-		configFile    = flag.String("config", "", "Path to configuration file")
 		port          = flag.String("port", "", "Override port setting")
 		logLevel      = flag.String("log-level", "", "Override log level (DEBUG, INFO, WARN, ERROR)")
 	)
