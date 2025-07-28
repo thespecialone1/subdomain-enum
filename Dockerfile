@@ -80,9 +80,6 @@ COPY --from=builder /app/subdomain-enum /app/subdomain-enum
 # Copy static files (web interface)
 COPY --from=builder /app/public/ /app/public/
 
-# Create necessary directories and set permissions
-# Note: distroless runs as nobody (65534:65534) by default
-
 # Environment variables with secure defaults
 ENV PORT=8080 \
     METRICS_PORT=9090 \
@@ -110,7 +107,7 @@ HEALTHCHECK --interval=30s \
            --timeout=10s \
            --start-period=5s \
            --retries=3 \
-    CMD ["/app/subdomain-enum", "--health-check"] || exit 1
+    CMD ["/app/subdomain-enum", "--health-check"]
 
 # Use non-root user (distroless handles this automatically)
 USER 65534:65534
@@ -155,10 +152,7 @@ ENV GIN_MODE=debug \
 EXPOSE 8080 9090
 
 # Development command with hot reloading
-CMD ["go", "run", "cmd/server/main.go"]
-
-# Multi-architecture build support
-FROM production AS final# Enhanced Subdomain Enumeration Tool v2.2 - Production Docker Build
+CMD ["go", "run", "cmd/server/main.go"]# Enhanced Subdomain Enumeration Tool v2.2 - Production Docker Build
 # Multi-stage build for optimal image size and security
 
 ARG GO_VERSION=1.21
