@@ -1,33 +1,124 @@
-# Git
+# Git and version control
 .git
 .gitignore
+.gitattributes
+.github
 
 # Documentation
 README.md
+CHANGELOG.md
+LICENSE
 *.md
+docs/
 
-# Build artifacts
-dist/
-*.exe
-subdomain-enum-*
+# Docker files (avoid recursion)
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+.dockerenv
 
-# IDE files
+# Development tools and configs
 .vscode/
 .idea/
-
-# OS files
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.temp
+# Build artifacts and binaries
+subdomain-enum*
+*.exe
+*.dll
+*.so
+*.dylib
+dist/
+build/
+bin/
+
+# Go specific
+vendor/
+*.test
+*.prof
+*.out
+coverage.txt
+coverage.html
+
+# Logs and temporary files
 *.log
-misc.txt
+logs/
+tmp/
+temp/
+.tmp/
 
-# Test files
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+secrets/
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+test/
+tests/
 *_test.go
+testdata/
 
-# Docker
-Dockerfile
-.dockerignore
+# CI/CD
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Deployment configs
+k8s/
+kubernetes/
+helm/
+terraform/
+
+# IDE and editor files
+*.sublime-*
+.vscode
+.idea
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Large datasets or wordlists (keep only essential ones)
+wordlists/
+data/
+datasets/
+
+# Performance and profiling
+*.pprof
+profile.out
+mem.out
+cpu.out
+
+# Coverage reports
+coverage/
+htmlcov/

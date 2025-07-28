@@ -1,0 +1,811 @@
+package main
+
+import (
+    "bufio"
+    "encoding/csv"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+    "os"
+    "regexp"
+    "strings"
+    "sync"
+    "time"
+)
+
+var (
+    hostRe  = regexp.MustCompile(`https?://([^/]+)`)
+    titleRe = regexp.MustCompile(`(?is)<title>(.*?)</title>`)
+)
+
+type crtEntry struct {
+    NameValue string `json:"name_value"`
+}
+
+type result struct {
+    Host   string
+    Tried  string
+    Status string
+    Title  string
+    Err    string
+}
+
+func main() {
+    if len(os.Args) < 2 {
+        fmt.Fprintf(os.Stderr, "Usage: %s <domain>\n", os.Args[0])
+        os.Exit(1)
+    }
+    target := os.Args[1]
+
+    waybackCh := fetchWayback(target)
+    crtshCh   := fetchCrtSh(target)
+
+    var wg sync.WaitGroup
+    wg.Add(2)
+    go processSource("Wayback", waybackCh, "wayback_results.csv", &wg)
+    go processSource("crt.sh",   crtshCh,   "crtsh_results.csv",   &wg)
+    wg.Wait()
+
+    mergeCSVs("merged_results.csv", []string{
+        "wayback_results.csv",
+        "crtsh_results.csv",
+    })
+
+    fmt.Println("All done. You now have:")
+    fmt.Println(" - wayback_results.csv")
+    fmt.Println(" - crtsh_results.csv")
+    fmt.Println(" - merged_results.csv")
+}
+
+// fetchWayback streams *.target/* subdomains from the CDX API
+func fetchWayback(target string) <-chan string {
+    out := make(chan string)
+    go func() {
+        defer close(out)
+        api := fmt.Sprintf(
+            "https://web.archive.org/cdx/search/cdx?url=*.%s/*&output=text&fl=original&collapse=urlkey",
+            target,
+        )
+        resp, err := http.Get(api)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Wayback fetch error: %v\n", err)
+            return
+        }
+        defer resp.Body.Close()
+
+        scanner := bufio.NewScanner(resp.Body)
+        for scanner.Scan() {
+            line := scanner.Text()
+            if m := hostRe.FindStringSubmatch(line); m != nil {
+                host := strings.ToLower(m[1])
+                if strings.HasSuffix(host, "."+target) {
+                    out <- host
+                }
+            }
+        }
+        if err := scanner.Err(); err != nil {
+            fmt.Fprintf(os.Stderr, "Wayback scan error: %v\n", err)
+        }
+    }()
+    return out
+}
+
+// fetchCrtSh streams subdomains via crt.sh wildcard JSON
+func fetchCrtSh(target string) <-chan string {
+    out := make(chan string)
+    go func() {
+        defer close(out)
+        // Use %25. to wildcard all subdomains
+        api := fmt.Sprintf("https://crt.sh/?q=%%25.%s&output=json", target)
+        req, err := http.NewRequest("GET", api, nil)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "crt.sh request error: %v\n", err)
+            return
+        }
+        req.Header.Set("Accept", "application/json")
+        // Some crt.sh clients are picky about user-agent
+        req.Header.Set("User-Agent", "curl/7.64.1")
+
+        client := &http.Client{Timeout: 30 * time.Second}
+        resp, err := client.Do(req)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "crt.sh fetch error: %v\n", err)
+            return
+        }
+        defer resp.Body.Close()
+
+        ct := resp.Header.Get("Content-Type")
+        if !strings.Contains(ct, "json") {
+            fmt.Fprintf(os.Stderr, "crt.sh returned %s, not JSON\n", ct)
+            return
+        }
+
+        var entries []crtEntry
+        if err := json.NewDecoder(resp.Body).Decode(&entries); err != nil {
+            fmt.Fprintf(os.Stderr, "crt.sh JSON error: %v\n", err)
+            return
+        }
+
+        seen := make(map[string]struct{})
+        for _, e := range entries {
+            for _, name := range strings.Split(e.NameValue, "\n") {
+                host := strings.ToLower(strings.TrimSpace(name))
+                if strings.HasSuffix(host, "."+target) {
+                    if _, dup := seen[host]; !dup {
+                        seen[host] = struct{}{}
+                        out <- host
+                    }
+                }
+            }
+        }
+    }()
+    return out
+}
+
+// processSource probes hosts and writes CSV in real time
+func processSource(
+    name string,
+    hosts <-chan string,
+    fileName string,
+    wg *sync.WaitGroup,
+) {
+    defer wg.Done()
+    fmt.Printf("→ [%s] processing…\n", name)
+
+    file, err := os.Create(fileName)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "[%s] CSV create error: %v\n", name, err)
+        return
+    }
+    defer file.Close()
+
+    writer := csv.NewWriter(file)
+    writer.Write([]string{"Host", "TriedURL", "StatusCode", "Title", "Error"})
+    writer.Flush()
+
+    var mu sync.Mutex
+    seen := make(map[string]struct{})
+    sem := make(chan struct{}, 10)
+    client := &http.Client{Timeout: 10 * time.Second}
+
+    var pwg sync.WaitGroup
+    for host := range hosts {
+        if _, ok := seen[host]; ok {
+            continue
+        }
+        seen[host] = struct{}{}
+
+        fmt.Printf("  [%s] found: %s\n", name, host)
+        pwg.Add(1)
+        go func(h string) {
+            defer pwg.Done()
+            sem <- struct{}{}
+            defer func() { <-sem }()
+
+            r := probe(h, client)
+
+            if r.Err != "" {
+                fmt.Printf("  [%s] ✗ %s → error: %s\n", name, r.Host, r.Err)
+            } else {
+                fmt.Printf("  [%s] ✔ %s → %s → %s\n", name, r.Host, r.Status, r.Title)
+            }
+
+            mu.Lock()
+            writer.Write([]string{r.Host, r.Tried, r.Status, r.Title, r.Err})
+            writer.Flush()
+            mu.Unlock()
+        }(host)
+    }
+
+    pwg.Wait()
+    fmt.Printf("→ [%s] done, wrote %s\n", name, fileName)
+}
+
+// probe tries HTTPS then HTTP, reads up to 512 KB for <title>
+func probe(host string, client *http.Client) result {
+    var (
+        status int
+        title  string
+        tried  string
+        errMsg string
+    )
+    for _, scheme := range []string{"https://", "http://"} {
+        tried = scheme + host
+        resp, err := client.Get(tried)
+        if err != nil {
+            errMsg = err.Error()
+            continue
+        }
+        defer resp.Body.Close()
+        status = resp.StatusCode
+
+        buf := make([]byte, 512*1024)
+        n, _ := io.ReadFull(resp.Body, buf)
+        if m := titleRe.FindSubmatch(buf[:n]); len(m) > 1 {
+            title = strings.TrimSpace(htmlUnescape(string(m[1])))
+        }
+        errMsg = ""
+        break
+    }
+    return result{
+        Host:   host,
+        Tried:  tried,
+        Status: fmt.Sprintf("%d", status),
+        Title:  title,
+        Err:    errMsg,
+    }
+}
+
+// mergeCSVs merges and deduplicates on Host (first occurrence wins)
+func mergeCSVs(output string, inputs []string) {
+    outF, err := os.Create(output)
+    if err != nil {
+        panic(err)
+    }
+    defer outF.Close()
+
+    writer := csv.NewWriter(outF)
+    writer.Write([]string{"Host", "TriedURL", "StatusCode", "Title", "Error"})
+    writer.Flush()
+
+    seen := make(map[string]struct{})
+    for _, fname := range inputs {
+        f, err := os.Open(fname)
+        if err != nil {
+            continue
+        }
+        reader := csv.NewReader(f)
+        reader.Read() // skip header
+        for {
+            rec, err := reader.Read()
+            if err != nil {
+                break
+            }
+            host := rec[0]
+            if _, dup := seen[host]; dup {
+                continue
+            }
+            seen[host] = struct{}{}
+            writer.Write(rec)
+        }
+        f.Close()
+    }
+    writer.Flush()
+}
+
+func htmlUnescape(s string) string {
+    return strings.NewReplacer(
+        "&amp;", "&",
+        "&lt;", "<",
+        "&gt;", ">",
+        "&#39;", "'",
+        "&quot;", `"`,
+    ).Replace(s)
+}
+
+
+
+
+
+
+
+------------------------------------------------------------
+VERSION 2
+------------------------------------------------------------
+package main
+
+import (
+    "bufio"
+    "context"
+    "encoding/csv"
+    "encoding/json"
+    "fmt"
+    "io"
+    "log"
+    "net/http"
+    "os"
+    "path/filepath"
+    "regexp"
+    "strings"
+    "sync"
+    "time"
+)
+
+var (
+    hostRe  = regexp.MustCompile(`https?://([^/]+)`)
+    titleRe = regexp.MustCompile(`(?is)<title>(.*?)</title>`)
+
+    // Map of running jobs, protected by a mutex
+    jobs   = map[string]context.CancelFunc{}
+    jobsMu sync.Mutex
+)
+
+type crtEntry struct {
+    NameValue string `json:"name_value"`
+}
+
+type result struct {
+    Host   string
+    Tried  string
+    Status string
+    Title  string
+    Err    string
+}
+
+func main() {
+    mux := http.NewServeMux()
+
+    // Serve static UI
+    mux.Handle("/", http.FileServer(http.Dir("./public/")))
+
+    // SSE streams
+    mux.HandleFunc("/api/wayback/stream", waybackStream)
+    mux.HandleFunc("/api/crtsh/stream", crtshStream)
+
+    // Abort handler
+    mux.HandleFunc("/api/abort", abortHandler)
+
+    // File-size endpoint
+    mux.HandleFunc("/api/filesize", fileSizeHandler)
+
+    // Download endpoint
+    mux.HandleFunc("/api/download", downloadHandler)
+
+    log.Println("Listening on http://localhost:8080 …")
+    log.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+func sseHeader(w http.ResponseWriter) {
+    w.Header().Set("Content-Type", "text/event-stream")
+    w.Header().Set("Cache-Control", "no-cache")
+    w.Header().Set("Connection", "keep-alive")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func abortHandler(w http.ResponseWriter, r *http.Request) {
+    target := r.URL.Query().Get("target")
+    jobsMu.Lock()
+    cancelled := 0
+    // Cancel both wayback and crtsh streams for this target
+    for key, cancel := range jobs {
+        if strings.Contains(key, target) {
+            cancel()
+            delete(jobs, key)
+            cancelled++
+        }
+    }
+    jobsMu.Unlock()
+    
+    if cancelled > 0 {
+        log.Printf("Cancelled %d jobs for target: %s", cancelled, target)
+    }
+    
+    w.WriteHeader(http.StatusNoContent)
+}
+
+func waybackStream(w http.ResponseWriter, r *http.Request) {
+    target := r.URL.Query().Get("target")
+    if target == "" {
+        http.Error(w, "missing target", http.StatusBadRequest)
+        return
+    }
+    
+    sseHeader(w)
+    flusher, ok := w.(http.Flusher)
+    if !ok {
+        http.Error(w, "streaming not supported", http.StatusInternalServerError)
+        return
+    }
+
+    // Prepare CSV file
+    csvPath := "wayback_results.csv"
+    f, err := os.Create(csvPath)
+    if err != nil {
+        http.Error(w, "failed to create CSV file", http.StatusInternalServerError)
+        return
+    }
+    defer f.Close()
+
+    csvWriter := csv.NewWriter(f)
+    csvWriter.Write([]string{"Host", "TriedURL", "StatusCode", "Title", "Error"})
+    csvWriter.Flush()
+
+    // Create cancellable context
+    ctx, cancel := context.WithCancel(r.Context())
+    jobKey := target + "_wayback"
+    
+    jobsMu.Lock()
+    // Cancel any existing job for this target first
+    if existingCancel, exists := jobs[jobKey]; exists {
+        existingCancel()
+    }
+    jobs[jobKey] = cancel
+    jobsMu.Unlock()
+
+    defer func() {
+        jobsMu.Lock()
+        delete(jobs, jobKey)
+        jobsMu.Unlock()
+        csvWriter.Flush()
+        log.Printf("Wayback stream ended for %s", target)
+    }()
+
+    // Channel for results
+    resultCh := make(chan string, 100)
+    
+    // Start fetching data in background
+    go func() {
+        defer close(resultCh)
+        
+        apiURL := fmt.Sprintf(
+            "https://web.archive.org/cdx/search/cdx?url=*.%s/*&output=text&fl=original&collapse=urlkey",
+            target,
+        )
+        req, _ := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+        resp, err := http.DefaultClient.Do(req)
+        if err != nil {
+            log.Printf("Wayback API error: %v", err)
+            return
+        }
+        defer resp.Body.Close()
+
+        scanner := bufio.NewScanner(resp.Body)
+        seen := map[string]struct{}{}
+        
+        for scanner.Scan() {
+            select {
+            case <-ctx.Done():
+                return
+            default:
+            }
+            
+            line := scanner.Text()
+            if m := hostRe.FindStringSubmatch(line); m != nil {
+                host := strings.ToLower(m[1])
+                if strings.HasSuffix(host, "."+target) {
+                    if _, dup := seen[host]; !dup {
+                        seen[host] = struct{}{}
+                        select {
+                        case resultCh <- host:
+                        case <-ctx.Done():
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }()
+
+    // Start probing in background
+    client := &http.Client{Timeout: 10 * time.Second}
+    var csvMu sync.Mutex
+    
+    // Stream results to client and process them
+    for host := range resultCh {
+        select {
+        case <-ctx.Done():
+            return
+        default:
+        }
+        
+        // Send to client immediately
+        fmt.Fprintf(w, "data: %s\n\n", host)
+        flusher.Flush()
+        
+        // Probe in background
+        go func(h string) {
+            result := probe(h, client)
+            csvMu.Lock()
+            csvWriter.Write([]string{result.Host, result.Tried, result.Status, result.Title, result.Err})
+            csvWriter.Flush()
+            csvMu.Unlock()
+            log.Printf("Wayback probed: %s -> %s", result.Host, result.Status)
+        }(host)
+    }
+}
+
+func crtshStream(w http.ResponseWriter, r *http.Request) {
+    target := r.URL.Query().Get("target")
+    if target == "" {
+        http.Error(w, "missing target", http.StatusBadRequest)
+        return
+    }
+    
+    sseHeader(w)
+    flusher, ok := w.(http.Flusher)
+    if !ok {
+        http.Error(w, "streaming not supported", http.StatusInternalServerError)
+        return
+    }
+
+    csvPath := "crtsh_results.csv"
+    f, err := os.Create(csvPath)
+    if err != nil {
+        http.Error(w, "failed to create CSV file", http.StatusInternalServerError)
+        return
+    }
+    defer f.Close()
+
+    csvWriter := csv.NewWriter(f)
+    csvWriter.Write([]string{"Host", "TriedURL", "StatusCode", "Title", "Error"})
+    csvWriter.Flush()
+
+    ctx, cancel := context.WithCancel(r.Context())
+    jobKey := target + "_crtsh"
+    
+    jobsMu.Lock()
+    // Cancel any existing job for this target first
+    if existingCancel, exists := jobs[jobKey]; exists {
+        existingCancel()
+    }
+    jobs[jobKey] = cancel
+    jobsMu.Unlock()
+
+    defer func() {
+        jobsMu.Lock()
+        delete(jobs, jobKey)
+        jobsMu.Unlock()
+        csvWriter.Flush()
+        log.Printf("crt.sh stream ended for %s", target)
+        
+        // Only create merged CSV if this is the last active job for this target
+        jobsMu.Lock()
+        hasActiveJobs := false
+        for key := range jobs {
+            if strings.Contains(key, target) {
+                hasActiveJobs = true
+                break
+            }
+        }
+        jobsMu.Unlock()
+        
+        if !hasActiveJobs {
+            go func() {
+                time.Sleep(1 * time.Second) // Small delay to ensure CSV writes are complete
+                createMergedCSV()
+            }()
+        }
+    }()
+
+    // Channel for results
+    resultCh := make(chan string, 100)
+    
+    // Start fetching data in background
+    go func() {
+        defer close(resultCh)
+        
+        apiURL := fmt.Sprintf("https://crt.sh/?q=%%25.%s&output=json", target)
+        req, _ := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+        req.Header.Set("Accept", "application/json")
+        req.Header.Set("User-Agent", "curl/7.64.1")
+
+        client := &http.Client{Timeout: 30 * time.Second}
+        resp, err := client.Do(req)
+        if err != nil {
+            log.Printf("crt.sh API error: %v", err)
+            return
+        }
+        defer resp.Body.Close()
+
+        // Check if we actually got JSON
+        contentType := resp.Header.Get("Content-Type")
+        if !strings.Contains(contentType, "json") {
+            log.Printf("crt.sh returned non-JSON content type: %s", contentType)
+            return
+        }
+
+        var entries []crtEntry
+        if err := json.NewDecoder(resp.Body).Decode(&entries); err != nil {
+            log.Printf("crt.sh JSON decode error: %v", err)
+            return
+        }
+
+        seen := map[string]struct{}{}
+        if len(entries) == 0 {
+            log.Printf("crt.sh returned no entries for domain: %s", target)
+            return
+        }
+        
+        log.Printf("crt.sh found %d certificate entries for %s", len(entries), target)
+        
+        for _, e := range entries {
+            select {
+            case <-ctx.Done():
+                return
+            default:
+            }
+            
+            for _, name := range strings.Split(e.NameValue, "\n") {
+                host := strings.ToLower(strings.TrimSpace(name))
+                // Remove any wildcard characters
+                host = strings.TrimPrefix(host, "*.")
+                
+                if strings.HasSuffix(host, "."+target) && host != target {
+                    if _, dup := seen[host]; !dup {
+                        seen[host] = struct{}{}
+                        select {
+                        case resultCh <- host:
+                        case <-ctx.Done():
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }()
+
+    // Start probing in background
+    client := &http.Client{Timeout: 10 * time.Second}
+    var csvMu sync.Mutex
+    
+    // Stream results to client and process them
+    for host := range resultCh {
+        select {
+        case <-ctx.Done():
+            return
+        default:
+        }
+        
+        // Send to client immediately
+        fmt.Fprintf(w, "data: %s\n\n", host)
+        flusher.Flush()
+        
+        // Probe in background
+        go func(h string) {
+            result := probe(h, client)
+            csvMu.Lock()
+            csvWriter.Write([]string{result.Host, result.Tried, result.Status, result.Title, result.Err})
+            csvWriter.Flush()
+            csvMu.Unlock()
+            log.Printf("crt.sh probed: %s -> %s", result.Host, result.Status)
+        }(host)
+    }
+}
+
+func probe(host string, client *http.Client) result {
+    var (
+        status int
+        title  string
+        tried  string
+        errMsg string
+    )
+    
+    for _, scheme := range []string{"https://", "http://"} {
+        tried = scheme + host
+        resp, err := client.Get(tried)
+        if err != nil {
+            errMsg = err.Error()
+            continue
+        }
+        defer resp.Body.Close()
+        status = resp.StatusCode
+
+        buf := make([]byte, 512*1024)
+        n, _ := io.ReadFull(resp.Body, buf)
+        if m := titleRe.FindSubmatch(buf[:n]); len(m) > 1 {
+            title = strings.TrimSpace(htmlUnescape(string(m[1])))
+        }
+        errMsg = ""
+        break
+    }
+    
+    return result{
+        Host:   host,
+        Tried:  tried,
+        Status: fmt.Sprintf("%d", status),
+        Title:  title,
+        Err:    errMsg,
+    }
+}
+
+func htmlUnescape(s string) string {
+    return strings.NewReplacer(
+        "&amp;", "&",
+        "&lt;", "<",
+        "&gt;", ">",
+        "&#39;", "'",
+        "&quot;", `"`,
+    ).Replace(s)
+}
+
+func createMergedCSV() {
+    // Check if both files exist before merging
+    waybackExists := false
+    crtshExists := false
+    
+    if _, err := os.Stat("wayback_results.csv"); err == nil {
+        waybackExists = true
+    }
+    if _, err := os.Stat("crtsh_results.csv"); err == nil {
+        crtshExists = true
+    }
+    
+    if !waybackExists && !crtshExists {
+        log.Println("No CSV files to merge")
+        return
+    }
+    
+    outF, err := os.Create("merged_results.csv")
+    if err != nil {
+        log.Printf("Failed to create merged CSV: %v", err)
+        return
+    }
+    defer outF.Close()
+
+    writer := csv.NewWriter(outF)
+    defer writer.Flush()
+    
+    writer.Write([]string{"Host", "TriedURL", "StatusCode", "Title", "Error"})
+
+    seen := map[string]struct{}{}
+    processed := 0
+    
+    for _, fname := range []string{"wayback_results.csv", "crtsh_results.csv"} {
+        f, err := os.Open(fname)
+        if err != nil {
+            log.Printf("Skipping %s: %v", fname, err)
+            continue
+        }
+        
+        reader := csv.NewReader(f)
+        reader.Read() // skip header
+        
+        for {
+            rec, err := reader.Read()
+            if err != nil {
+                break
+            }
+            if len(rec) >= 5 { // Ensure we have all columns
+                host := rec[0]
+                if _, dup := seen[host]; !dup {
+                    seen[host] = struct{}{}
+                    writer.Write(rec)
+                    processed++
+                }
+            }
+        }
+        f.Close()
+    }
+    
+    log.Printf("Merged CSV created with %d unique hosts", processed)
+}
+
+func fileSizeHandler(w http.ResponseWriter, r *http.Request) {
+    fname := r.URL.Query().Get("file")
+    if fname == "" {
+        http.Error(w, "missing file", http.StatusBadRequest)
+        return
+    }
+    
+    info, err := os.Stat(fname)
+    if err != nil {
+        fmt.Fprint(w, "0")
+        return
+    }
+    fmt.Fprint(w, info.Size())
+}
+
+func downloadHandler(w http.ResponseWriter, r *http.Request) {
+    fname := r.URL.Query().Get("file")
+    allowed := map[string]struct{}{
+        "wayback_results.csv": {}, 
+        "crtsh_results.csv": {}, 
+        "merged_results.csv": {},
+    }
+    
+    if _, ok := allowed[fname]; !ok {
+        http.Error(w, "forbidden", http.StatusForbidden)
+        return
+    }
+    
+    path := filepath.Clean(fname)
+    if _, err := os.Stat(path); err != nil {
+        http.Error(w, "file not found", http.StatusNotFound)
+        return
+    }
+    
+    w.Header().Set("Content-Disposition", "attachment; filename="+fname)
+    w.Header().Set("Content-Type", "text/csv")
+    http.ServeFile(w, r, path)
+}

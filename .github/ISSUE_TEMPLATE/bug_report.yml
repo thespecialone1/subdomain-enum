@@ -1,0 +1,225 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve the tool
+title: "[BUG] "
+labels: [bug, needs-triage]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
+
+  - type: checkboxes
+    id: initial-checks
+    attributes:
+      label: Initial Checks
+      description: Please confirm you have done the following
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have read the documentation and troubleshooting guide
+          required: true
+        - label: I am using the latest version of the tool
+          required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe what happened and what you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Start the application with '...'
+        2. Navigate to '...'
+        3. Click on '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened instead?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened
+    validations:
+      required: true
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version of the tool are you running?
+      options:
+        - v2.2.0 (latest)
+        - v2.1.0
+        - v2.0.0
+        - main branch (development)
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment-method
+    attributes:
+      label: Deployment Method
+      description: How are you running the tool?
+      options:
+        - Docker container
+        - Docker Compose
+        - Kubernetes
+        - Binary (Linux)
+        - Binary (macOS)
+        - Binary (Windows)
+        - Build from source
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Linux (Ubuntu)
+        - Linux (CentOS/RHEL)
+        - Linux (Alpine)
+        - Linux (Other)
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Windows 10
+        - Windows 11
+        - Windows Server
+        - FreeBSD
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: go-version
+    attributes:
+      label: Go Version (if building from source)
+      description: Output of `go version`
+      placeholder: "go version go1.21.0 linux/amd64"
+
+  - type: input
+    id: docker-version
+    attributes:
+      label: Docker Version (if using containers)
+      description: Output of `docker --version`
+      placeholder: "Docker version 24.0.2, build cb74dfc"
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration
+      description: |
+        Please share your configuration (environment variables, command-line flags, etc.)
+        **Important: Remove any sensitive information like API keys or internal URLs**
+      placeholder: |
+        Environment variables:
+        PORT=8080
+        DNS_CONCURRENCY=50
+        RATE_LIMIT_RPS=10
+        
+        Command line:
+        ./subdomain-enum --port 8080
+      render: bash
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: |
+        Please copy and paste any relevant log output. 
+        **Important: Remove any sensitive information like internal IPs or domains**
+      render: shell
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Browser Console Errors (if web interface issue)
+      description: Open Developer Tools (F12) and check for errors in the Console tab
+      render: javascript
+
+  - type: textarea
+    id: network-errors
+    attributes:
+      label: Network Errors (if API/connectivity issue)
+      description: Check Network tab in Developer Tools for failed requests
+      render: text
+
+  - type: input
+    id: target-domain
+    attributes:
+      label: Target Domain (if relevant)
+      description: |
+        Domain you were scanning when the issue occurred
+        **Only share if you own the domain or it's a public example like example.com**
+      placeholder: "example.com"
+
+  - type: dropdown
+    id: bug-severity
+    attributes:
+      label: Bug Severity
+      description: How severe is this bug?
+      options:
+        - Low - Minor issue, workaround exists
+        - Medium - Significant issue, affects functionality
+        - High - Major issue, prevents normal usage
+        - Critical - Application crash or security issue
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      description: How often does this bug occur?
+      options:
+        - Always (100%)
+        - Often (75-99%)
+        - Sometimes (25-74%)
+        - Rarely (1-24%)
+        - Once
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Add any other context about the problem here such as:
+        - Screenshots or videos
+        - Network environment details
+        - Related issues or discussions
+        - Temporary workarounds you've found
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to help fix this issue?
+      options:
+        - label: I would like to work on fixing this bug
+        - label: I can provide additional testing
+        - label: I can help with documentation updates

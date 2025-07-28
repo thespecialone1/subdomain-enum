@@ -1,0 +1,243 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement
+title: "[FEATURE] "
+labels: [enhancement, needs-triage]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Please provide as much detail as possible to help us understand your needs.
+
+  - type: checkboxes
+    id: initial-checks
+    attributes:
+      label: Initial Checks
+      description: Please confirm you have done the following
+      options:
+        - label: I have searched existing issues and this feature has not been requested
+          required: true
+        - label: I have checked the roadmap and this feature is not already planned
+          required: true
+        - label: This feature would be useful to other users, not just myself
+          required: true
+
+  - type: textarea
+    id: feature-summary
+    attributes:
+      label: Feature Summary
+      description: A brief, clear description of the feature you'd like to see
+      placeholder: "Add support for custom wordlists in the web interface"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What pain point does it address?
+      placeholder: |
+        Currently, users need to modify the source code to add custom subdomain patterns.
+        This is inconvenient for security professionals who have their own specialized wordlists.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your ideal solution in detail
+      placeholder: |
+        Add a "Custom Wordlists" section in the Settings tab where users can:
+        1. Upload text files with custom subdomain patterns
+        2. Enable/disable specific wordlists during scans  
+        3. Preview wordlist contents before scanning
+        4. Save frequently used wordlists for future use
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches have you considered?
+      placeholder: |
+        - Environment variable with file paths (less user-friendly)
+        - Command-line flags (not accessible via web interface)
+        - API endpoint for wordlist management (more complex to implement)
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: Feature Category
+      description: Which area of the tool does this feature relate to?
+      options:
+        - Web Interface / UI
+        - Discovery Sources
+        - Configuration / Settings
+        - Export / Integration
+        - Performance / Optimization
+        - Security / Authentication
+        - Monitoring / Logging
+        - API / Automation
+        - Deployment / DevOps
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve workflow
+        - High - Needed for professional use
+        - Critical - Blocking current usage
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity (your estimate)
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Minor UI changes or configuration additions
+        - Moderate - New components or API endpoints
+        - Complex - Significant architectural changes
+        - Very Complex - Major system redesign
+        - Unknown - I'm not sure about the technical complexity
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific scenarios where this feature would be valuable
+      placeholder: |
+        1. Penetration testers with industry-specific wordlists
+        2. Bug bounty hunters with custom subdomain patterns
+        3. Security teams with internal naming conventions
+        4. Researchers studying subdomain patterns across different sectors
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-workflow
+    attributes:
+      label: User Workflow
+      description: Walk through how a user would interact with this feature
+      placeholder: |
+        1. User navigates to Settings tab
+        2. Clicks "Upload Custom Wordlist" 
+        3. Selects a .txt file from their computer
+        4. Reviews the uploaded patterns in a preview
+        5. Gives the wordlist a name and saves it
+        6. In the Scan tab, enables the custom wordlist for DNS brute force
+        7. Starts scan and sees results from custom patterns
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What specific requirements must be met for this feature to be complete?
+      placeholder: |
+        - [ ] Users can upload .txt files with one pattern per line
+        - [ ] Uploaded wordlists are validated for format and size
+        - [ ] Users can enable/disable wordlists during scan configuration
+        - [ ] Custom patterns are integrated with existing DNS brute force
+        - [ ] Wordlists persist between browser sessions
+        - [ ] File size is limited to prevent memory issues
+        - [ ] Invalid patterns are filtered out with warnings
+
+  - type: dropdown
+    id: target-users
+    attributes:
+      label: Target Users
+      description: Who would primarily benefit from this feature?
+      options:
+        - Beginner users
+        - Intermediate users  
+        - Advanced/Professional users
+        - All users
+        - Specific use case (explain in additional context)
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups-wireframes
+    attributes:
+      label: Mockups or Wireframes
+      description: |
+        If you have any visual ideas, you can describe them here or attach images
+        (You can drag and drop images into this text area)
+      placeholder: |
+        Describe the UI layout, or attach mockups/wireframes if you have them
+
+  - type: textarea
+    id: technical-considerations
+    attributes:
+      label: Technical Considerations
+      description: Any technical aspects or constraints to consider?
+      placeholder: |
+        - File upload security (validate file types, scan for malicious content)
+        - Memory usage for large wordlists
+        - Storage mechanism (browser localStorage vs server-side)
+        - Integration with existing DNS brute force logic
+        - Performance impact on scan times
+
+  - type: textarea
+    id: related-features
+    attributes:
+      label: Related Features
+      description: Are there other features that would complement this one?
+      placeholder: |
+        - Wordlist sharing between team members
+        - Pre-built wordlist collections for different industries
+        - Wordlist statistics and analytics
+        - Export functionality for custom wordlists
+
+  - type: input
+    id: inspiration
+    attributes:
+      label: Inspiration
+      description: Are there other tools that implement something similar?
+      placeholder: "Tool X has a feature like this where..."
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any other information that would help us understand your request
+        - Links to relevant documentation
+        - Screenshots from other tools
+        - Research or articles supporting the need
+        - Community discussions about this topic
+
+  - type: checkboxes
+    id: contribution-willingness
+    attributes:
+      label: Contribution
+      description: Would you be willing to help implement this feature?
+      options:
+        - label: I would like to work on implementing this feature
+        - label: I can help with design and requirements
+        - label: I can provide testing and feedback
+        - label: I can help with documentation
+        - label: I can provide domain expertise
+
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Desired Timeline
+      description: When would you ideally like to see this feature?
+      options:
+        - Next patch release (weeks)
+        - Next minor release (1-2 months)
+        - Next major release (3-6 months)
+        - Future release (6+ months)
+        - No specific timeline

@@ -11,45 +11,118 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111;
+            --bg-tertiary: #1a1a1a;
+            --bg-quaternary: #222;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888;
+            --accent-primary: #4ade80;
+            --accent-secondary: #22c55e;
+            --accent-warning: #fbbf24;
+            --accent-error: #ff6b6b;
+            --border-primary: #333;
+            --border-secondary: #444;
+            --shadow-primary: rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+
         body {
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            background: #0a0a0a;
-            color: #ffffff;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
         }
 
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-quaternary) 100%);
+            padding: 1.5rem 2rem;
             text-align: center;
-            border-bottom: 2px solid #333;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid var(--border-primary);
+            box-shadow: 0 4px 20px var(--shadow-primary);
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 300;
-            letter-spacing: 3px;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(45deg, #ffffff, #cccccc);
+            letter-spacing: 2px;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(45deg, var(--text-primary), var(--text-secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .header p {
-            color: #888;
-            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
             letter-spacing: 1px;
         }
 
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: center;
+            padding: 0 1rem;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-secondary);
+        }
+
+        .nav-tab.active {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-primary);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Control Panel */
         .control-panel {
-            background: #111;
-            padding: 2rem;
-            border-bottom: 1px solid #333;
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-primary);
         }
 
         .main-controls {
@@ -62,47 +135,76 @@
         }
 
         .source-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
-            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .source-toggle {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: #1a1a1a;
-            padding: 0.8rem 1.2rem;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+            padding: 1rem;
             border-radius: 8px;
-            border: 2px solid #333;
-            transition: all 0.3s ease;
+            border: 2px solid var(--border-primary);
+            transition: var(--transition);
             cursor: pointer;
         }
 
         .source-toggle:hover {
-            border-color: #555;
-            background: #222;
+            border-color: var(--border-secondary);
+            background: var(--bg-quaternary);
         }
 
         .source-toggle.active {
-            border-color: #666;
-            background: #2a2a2a;
+            border-color: var(--accent-primary);
+            background: var(--bg-quaternary);
+        }
+
+        .source-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .source-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .source-description {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .source-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .source-counter {
+            background: var(--border-primary);
+            color: var(--text-primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
         }
 
         .source-toggle input[type="checkbox"] {
-            margin: 0;
-            transform: scale(1.2);
-        }
-
-        .source-toggle label {
-            color: #ccc;
-            font-weight: 500;
+            transform: scale(1.3);
             cursor: pointer;
-            user-select: none;
         }
 
+        /* Input Styles */
         .input-group {
             display: flex;
             align-items: center;
@@ -110,40 +212,41 @@
         }
 
         .input-group label {
-            color: #ccc;
+            color: var(--text-secondary);
             font-weight: 500;
             min-width: 80px;
         }
 
-        input[type="text"] {
-            background: #1a1a1a;
-            border: 2px solid #333;
-            color: #fff;
+        input[type="text"], select {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-primary);
+            color: var(--text-primary);
             padding: 0.8rem 1.2rem;
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
             min-width: 300px;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, select:focus {
             outline: none;
-            border-color: #555;
-            box-shadow: 0 0 0 3px rgba(85, 85, 85, 0.3);
+            border-color: var(--border-secondary);
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
         }
 
+        /* Button Styles */
         .btn {
-            background: #222;
-            border: 2px solid #444;
-            color: #fff;
+            background: var(--bg-quaternary);
+            border: 2px solid var(--border-secondary);
+            color: var(--text-primary);
             padding: 0.8rem 2rem;
             border-radius: 8px;
             cursor: pointer;
             font-family: inherit;
             font-size: 1rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             text-transform: uppercase;
             letter-spacing: 1px;
             display: flex;
@@ -152,47 +255,34 @@
         }
 
         .btn:hover {
-            background: #333;
-            border-color: #666;
+            background: var(--border-primary);
+            border-color: var(--border-secondary);
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .btn.primary {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
         }
 
         .btn.primary:hover {
-            background: #f0f0f0;
-            border-color: #f0f0f0;
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
         }
 
         .btn.danger {
-            background: #333;
-            border-color: #555;
+            background: var(--accent-error);
+            color: var(--text-primary);
+            border-color: var(--accent-error);
         }
 
-        .btn.danger:hover {
-            background: #444;
-            border-color: #666;
-        }
-
-        .btn.copy {
-            background: #1a1a1a;
-            border-color: #333;
+        .btn.secondary {
+            background: transparent;
+            border-color: var(--border-primary);
             padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-
-        .btn.copy:hover {
-            background: #2a2a2a;
-            border-color: #555;
+            font-size: 0.85rem;
         }
 
         .btn:disabled {
@@ -201,97 +291,128 @@
             transform: none;
         }
 
-        .status-bar {
-            background: #0f0f0f;
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--bg-primary);
             padding: 1rem 2rem;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid var(--border-primary);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .status-group {
-            display: flex;
-            gap: 2rem;
+            justify-content: center;
+            gap: 3rem;
             flex-wrap: wrap;
         }
 
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #ccc;
+        .stat-item {
+            text-align: center;
         }
 
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #333;
-            transition: all 0.3s ease;
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+            display: block;
         }
 
-        .status-indicator.active {
-            background: #4ade80;
-            box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .status-indicator.finished {
-            background: #666;
-        }
-
-        .main-content {
+        /* Results Layout */
+        .results-layout {
             flex: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 0;
-            min-height: 60vh;
+            display: flex;
+            min-height: 0;
         }
 
-        .source-panel {
-            background: #0d0d0d;
-            border-right: 1px solid #222;
+        .results-sidebar {
+            width: 300px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
             display: flex;
             flex-direction: column;
         }
 
-        .source-panel:last-child {
-            border-right: none;
+        .results-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
 
-        .source-header {
-            background: #1a1a1a;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #222;
+        /* Source List in Sidebar */
+        .source-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .source-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            transition: var(--transition);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .source-title-section {
+        .source-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .source-item.active {
+            background: var(--bg-tertiary);
+            border-right: 3px solid var(--accent-primary);
+        }
+
+        .source-item-info h4 {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .source-item-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
-        .source-title {
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-primary);
+        }
+
+        .status-dot.active {
+            background: var(--accent-primary);
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+        }
+
+        .status-dot.finished {
+            background: var(--text-muted);
+        }
+
+        /* Main Results Panel */
+        .results-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-title {
             font-weight: 600;
-            font-size: 1.1rem;
-            color: #fff;
+            color: var(--text-primary);
         }
 
-        .source-counter {
-            background: #333;
-            color: #fff;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .source-actions {
+        .results-actions {
             display: flex;
             gap: 0.5rem;
         }
@@ -300,23 +421,23 @@
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
-            max-height: 500px;
         }
 
         .result-item {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
             padding: 1rem;
             margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             animation: slideIn 0.3s ease;
             cursor: pointer;
         }
 
         .result-item:hover {
-            background: #151515;
-            border-color: #333;
+            background: var(--bg-tertiary);
+            border-color: var(--border-secondary);
+            transform: translateY(-1px);
         }
 
         @keyframes slideIn {
@@ -332,55 +453,173 @@
 
         .result-host {
             font-weight: 600;
-            color: #fff;
-            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
             word-break: break-all;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-arrow {
-            color: #666;
-            text-decoration: none;
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
-        }
-
-        .nav-arrow:hover {
-            color: #fff;
+            justify-content: space-between;
         }
 
         .result-details {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             gap: 1rem;
-            font-size: 0.9rem;
-            color: #888;
-            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            align-items: center;
         }
 
         .result-status {
-            background: #222;
-            padding: 0.2rem 0.5rem;
+            background: var(--bg-quaternary);
+            padding: 0.3rem 0.6rem;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .result-status.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .result-status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--accent-error);
         }
 
         .result-title {
-            flex: 1;
             min-width: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        .nav-arrow {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            padding: 0.2rem;
+        }
+
+        .nav-arrow:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Settings Panel Styles */
+        .settings-section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .settings-header {
+            background: var(--bg-tertiary);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .settings-header h3 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .settings-description {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .settings-content {
+            padding: 1.5rem;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .setting-input {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .setting-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        /* Export Panel */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .export-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .export-card:hover {
+            background: var(--bg-quaternary);
+            border-color: var(--border-secondary);
+        }
+
+        .export-icon {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 0.8rem;
+            display: block;
+            color: var(--accent-primary);
+            transition: var(--transition);
+        }
+
+        .export-card:hover .export-icon {
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .export-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .export-description {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Empty State */
         .empty-state {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 200px;
-            color: #666;
+            height: 300px;
+            color: var(--text-muted);
             font-style: italic;
         }
 
@@ -391,7 +630,7 @@
             opacity: 0.5;
         }
 
-        /* Modal Styles */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -405,10 +644,10 @@
         }
 
         .modal-content {
-            background: #111;
+            background: var(--bg-secondary);
             margin: 5% auto;
             padding: 0;
-            border: 2px solid #333;
+            border: 2px solid var(--border-primary);
             border-radius: 12px;
             width: 80%;
             max-width: 600px;
@@ -429,9 +668,9 @@
         }
 
         .modal-header {
-            background: #1a1a1a;
+            background: var(--bg-tertiary);
             padding: 1.5rem;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--border-primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -440,20 +679,20 @@
         .modal-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--text-primary);
             word-break: break-all;
         }
 
         .close {
-            color: #666;
+            color: var(--text-muted);
             font-size: 2rem;
             font-weight: bold;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: var(--transition);
         }
 
         .close:hover {
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .modal-body {
@@ -465,7 +704,7 @@
         }
 
         .detail-label {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.9rem;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
@@ -473,51 +712,106 @@
         }
 
         .detail-value {
-            color: #fff;
+            color: var(--text-primary);
             font-size: 1rem;
             padding: 0.8rem;
-            background: #0a0a0a;
-            border: 1px solid #222;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
             border-radius: 6px;
             word-break: break-all;
         }
 
-        .detail-value.error {
-            color: #ff6b6b;
-            font-size: 0.9rem;
-            max-height: 100px;
-            overflow-y: auto;
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .results-layout {
+                flex-direction: column;
+            }
+            
+            .results-sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+            
+            .source-list {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .source-item {
+                min-width: 150px;
+                border-bottom: none;
+                border-right: 1px solid var(--border-primary);
+            }
         }
 
-        .detail-value.status {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .control-panel {
+                padding: 1rem;
+            }
+            
+            .main-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            input[type="text"] {
+                min-width: 250px;
+            }
+            
+            .stats-bar {
+                gap: 2rem;
+            }
+            
+            .source-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
         }
 
-        .detail-value.status.success {
-            background: #2a2a2a;
-            color: #4ade80;
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
 
-        .detail-value.status.error {
-            background: #2a1a1a;
-            color: #ff6b6b;
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
         }
 
-        .copy-notification {
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-secondary);
+        }
+
+        /* Notification */
+        .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #222;
-            color: #fff;
+            background: var(--bg-quaternary);
+            color: var(--text-primary);
             padding: 1rem 1.5rem;
             border-radius: 8px;
-            border: 1px solid #444;
+            border: 1px solid var(--border-secondary);
             z-index: 1001;
             animation: slideInRight 0.3s ease;
+            max-width: 300px;
         }
 
         @keyframes slideInRight {
@@ -531,107 +825,22 @@
             }
         }
 
-        .progress-bar {
-            background: #1a1a1a;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 1rem;
+        .notification.success {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
         }
 
-        .progress-fill {
-            background: linear-gradient(90deg, #4ade80, #22c55e);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 2px;
+        .notification.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--accent-error);
+            border-color: var(--accent-error);
         }
 
-        .stats-summary {
-            background: #0f0f0f;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #222;
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #4ade80;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .source-panel {
-                border-right: none;
-                border-bottom: 1px solid #222;
-            }
-            
-            .main-controls, .source-controls {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            input[type="text"] {
-                min-width: 250px;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-            }
-
-            .status-group {
-                gap: 1rem;
-            }
-
-            .stats-summary {
-                gap: 2rem;
-            }
-        }
-
-        /* Custom scrollbar */
-        .results-container::-webkit-scrollbar,
-        .modal-content::-webkit-scrollbar,
-        .detail-value.error::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .results-container::-webkit-scrollbar-track,
-        .modal-content::-webkit-scrollbar-track,
-        .detail-value.error::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-
-        .results-container::-webkit-scrollbar-thumb,
-        .modal-content::-webkit-scrollbar-thumb,
-        .detail-value.error::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-
-        .results-container::-webkit-scrollbar-thumb:hover,
-        .modal-content::-webkit-scrollbar-thumb:hover,
-        .detail-value.error::-webkit-scrollbar-thumb:hover {
-            background: #444;
+        .notification.warning {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--accent-warning);
+            border-color: var(--accent-warning);
         }
     </style>
 </head>
@@ -641,208 +850,745 @@
         <p>Multi-source reconnaissance & discovery platform</p>
     </div>
 
-    <div class="control-panel">
-        <div class="main-controls">
-            <div class="input-group">
-                <label for="domain">Target:</label>
-                <input type="text" id="domain" placeholder="example.com" value="example.com">
+            <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="scan">Scan</button>
+        <button class="nav-tab" data-tab="settings">Settings</button>
+        <button class="nav-tab" data-tab="export">Export</button>
+        <button class="nav-tab" data-tab="metrics">Metrics</button>
+        <button class="nav-tab" data-tab="help">Help</button>
+    </div>
+
+    <!-- Scan Tab -->
+    <div class="tab-content active" id="scan-tab">
+        <div class="control-panel">
+            <div class="main-controls">
+                <div class="input-group">
+                    <label for="domain">Target:</label>
+                    <input type="text" id="domain" placeholder="example.com" value="example.com">
+                </div>
+                <button id="startBtn" class="btn primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z"/>
+                    </svg>
+                    Start Scan
+                </button>
+                <button id="stopBtn" class="btn danger" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18,18H6V6H18V18Z"/>
+                    </svg>
+                    Stop Scan
+                </button>
             </div>
-            <button id="startBtn" class="btn primary">Start Scan</button>
-            <button id="stopBtn" class="btn danger" disabled>Stop Scan</button>
+            
+            <div class="source-controls">
+                <div class="source-toggle active">
+                    <div class="source-info">
+                        <div class="source-name">Wayback Machine</div>
+                        <div class="source-description">Historical subdomain discovery from web archives</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="waybackCounter">0</span>
+                        <input type="checkbox" id="wayback-toggle" checked>
+                    </div>
+                </div>
+                
+                <div class="source-toggle active">
+                    <div class="source-info">
+                        <div class="source-name">Certificate Transparency</div>
+                        <div class="source-description">SSL/TLS certificate logs (crt.sh)</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="crtshCounter">0</span>
+                        <input type="checkbox" id="crtsh-toggle" checked>
+                    </div>
+                </div>
+                
+                <div class="source-toggle active">
+                    <div class="source-info">
+                        <div class="source-name">DNS Brute Force</div>
+                        <div class="source-description">Dictionary-based DNS resolution with 500+ patterns</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="dnsCounter">0</span>
+                        <input type="checkbox" id="dns-toggle" checked>
+                    </div>
+                </div>
+                
+                <div class="source-toggle">
+                    <div class="source-info">
+                        <div class="source-name">Search Engine Scraping</div>
+                        <div class="source-description">Automated Google search result parsing</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="searchCounter">0</span>
+                        <input type="checkbox" id="search-toggle">
+                    </div>
+                </div>
+                
+                <div class="source-toggle">
+                    <div class="source-info">
+                        <div class="source-name">Permutation Generation</div>
+                        <div class="source-description">Intelligent subdomain variations</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="permuteCounter">0</span>
+                        <input type="checkbox" id="permute-toggle">
+                    </div>
+                </div>
+                
+                <div class="source-toggle">
+                    <div class="source-info">
+                        <div class="source-name">Zone Transfer</div>
+                        <div class="source-description">DNS zone transfer testing</div>
+                    </div>
+                    <div class="source-controls-right">
+                        <span class="source-counter" id="zoneCounter">0</span>
+                        <input type="checkbox" id="zone-toggle">
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="source-controls">
-            <div class="source-toggle active">
-                <input type="checkbox" id="wayback-toggle" checked>
-                <label for="wayback-toggle">Wayback Machine</label>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="totalCount">0</span>
+                <span class="stat-label">Total Found</span>
             </div>
-            <div class="source-toggle active">
-                <input type="checkbox" id="crtsh-toggle" checked>
-                <label for="crtsh-toggle">Certificate Transparency</label>
+            <div class="stat-item">
+                <span class="stat-number" id="activeCount">0</span>
+                <span class="stat-label">Active Sources</span>
             </div>
-            <div class="source-toggle active">
-                <input type="checkbox" id="dns-toggle" checked>
-                <label for="dns-toggle">DNS Brute Force</label>
+            <div class="stat-item">
+                <span class="stat-number" id="scanTime">00:00</span>
+                <span class="stat-label">Elapsed</span>
             </div>
-            <div class="source-toggle">
-                <input type="checkbox" id="search-toggle">
-                <label for="search-toggle">Search Engine Scraping</label>
+            <div class="stat-item">
+                <span class="stat-number" id="probeCount">0</span>
+                <span class="stat-label">HTTP Probes</span>
             </div>
-            <div class="source-toggle">
-                <input type="checkbox" id="permute-toggle">
-                <label for="permute-toggle">Permutation Generation</label>
+        </div>
+
+        <div class="results-layout">
+            <div class="results-sidebar">
+                <div class="source-list">
+                    <div class="source-item active" data-source="all">
+                        <div class="source-item-info">
+                            <h4>All Results</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot"></span>
+                                <span id="allResultsCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="wayback">
+                        <div class="source-item-info">
+                            <h4>Wayback Machine</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="waybackDot"></span>
+                                <span id="waybackCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="crtsh">
+                        <div class="source-item-info">
+                            <h4>Certificate Transparency</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="crtshDot"></span>
+                                <span id="crtshCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="dns">
+                        <div class="source-item-info">
+                            <h4>DNS Brute Force</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="dnsDot"></span>
+                                <span id="dnsCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="search">
+                        <div class="source-item-info">
+                            <h4>Search Engine</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="searchDot"></span>
+                                <span id="searchCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="permute">
+                        <div class="source-item-info">
+                            <h4>Permutation</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="permuteDot"></span>
+                                <span id="permuteCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="source-item" data-source="zone">
+                        <div class="source-item-info">
+                            <h4>Zone Transfer</h4>
+                            <div class="source-item-meta">
+                                <span class="status-dot" id="zoneDot"></span>
+                                <span id="zoneCount">0 found</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="source-toggle">
-                <input type="checkbox" id="zone-toggle">
-                <label for="zone-toggle">Zone Transfer</label>
+
+            <div class="results-main">
+                <div class="results-header">
+                    <h3 class="results-title" id="currentViewTitle">All Results</h3>
+                    <div class="results-actions">
+                        <button class="btn secondary" id="copyCurrentBtn">Copy Current View</button>
+                        <button class="btn secondary" id="exportCurrentBtn">Export Current</button>
+                    </div>
+                </div>
+                <div class="results-container" id="mainResults">
+                    <div class="empty-state">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span>Start a scan to see results here</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="stats-summary">
-        <div class="stat-item">
-            <span class="stat-number" id="totalCount">0</span>
-            <span class="stat-label">Total Found</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" id="activeCount">0</span>
-            <span class="stat-label">Active Sources</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" id="scanTime">00:00</span>
-            <span class="stat-label">Elapsed</span>
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings-tab">
+        <div class="control-panel">
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Timeout Configuration</h3>
+                    <p class="settings-description">Configure timeout values for each discovery source (in minutes)</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">Wayback Machine Timeout</label>
+                                <input type="number" class="setting-input" id="waybackTimeout" value="5" min="1" max="30">
+                            </div>
+                            <span class="setting-unit">minutes</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">Certificate Transparency Timeout</label>
+                                <input type="number" class="setting-input" id="crtshTimeout" value="5" min="1" max="30">
+                            </div>
+                            <span class="setting-unit">minutes</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">DNS Brute Force Timeout</label>
+                                <input type="number" class="setting-input" id="dnsTimeout" value="10" min="1" max="60">
+                            </div>
+                            <span class="setting-unit">minutes</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">Search Engine Timeout</label>
+                                <input type="number" class="setting-input" id="searchTimeout" value="5" min="1" max="30">
+                            </div>
+                            <span class="setting-unit">minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Performance Settings</h3>
+                    <p class="settings-description">Adjust concurrency and rate limiting parameters</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">DNS Concurrent Queries</label>
+                                <input type="number" class="setting-input" id="dnsConcurrency" value="50" min="1" max="200">
+                            </div>
+                            <span class="setting-unit">parallel requests</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">HTTP Probe Timeout</label>
+                                <input type="number" class="setting-input" id="probeTimeout" value="10" min="1" max="60">
+                            </div>
+                            <span class="setting-unit">seconds</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="setting-row">
+                            <div>
+                                <label class="setting-label">Enable HTTPS-First Probing</label>
+                                <input type="checkbox" id="httpsFirst" checked>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>DNS Servers</h3>
+                    <p class="settings-description">Configure DNS resolvers for brute force attacks</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Primary DNS Server</label>
+                        <select class="setting-input" id="primaryDns">
+                            <option value="8.8.8.8">Google DNS (8.8.8.8)</option>
+                            <option value="1.1.1.1">Cloudflare DNS (1.1.1.1)</option>
+                            <option value="208.67.222.222">OpenDNS (208.67.222.222)</option>
+                            <option value="9.9.9.9">Quad9 DNS (9.9.9.9)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label">Secondary DNS Server</label>
+                        <select class="setting-input" id="secondaryDns">
+                            <option value="8.8.4.4">Google DNS (8.8.4.4)</option>
+                            <option value="1.0.0.1">Cloudflare DNS (1.0.0.1)</option>
+                            <option value="208.67.220.220">OpenDNS (208.67.220.220)</option>
+                            <option value="149.112.112.112">Quad9 DNS (149.112.112.112)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Custom Wordlists</h3>
+                    <p class="settings-description">Add custom subdomain patterns for brute force attacks</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Additional Subdomains (one per line)</label>
+                        <textarea id="customWordlist" class="setting-input" rows="6" style="min-width: 100%; resize: vertical;" placeholder="api-dev&#10;staging-api&#10;v2-backend&#10;internal-tools&#10;beta-portal"></textarea>
+                    </div>
+                    <div class="setting-group">
+                        <button class="btn secondary" id="saveWordlistBtn">Save Custom Wordlist</button>
+                        <button class="btn secondary" id="resetWordlistBtn">Reset to Default</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="status-bar">
-        <div class="status-group">
-            <div class="status-item">
-                <div class="status-indicator" id="waybackIndicator"></div>
-                <span>Wayback Machine</span>
+    <!-- Export Tab -->
+    <div class="tab-content" id="export-tab">
+        <div class="control-panel">
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Export Results</h3>
+                    <p class="settings-description">Export your scan results in various formats</p>
+                </div>
+                <div class="settings-content">
+                    <div class="export-options">
+                        <div class="export-card" id="exportTxt">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                            </svg>
+                            <div class="export-title">Plain Text</div>
+                            <div class="export-description">Simple list of subdomains, one per line</div>
+                        </div>
+                        <div class="export-card" id="exportCsv">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                <path d="M9,13H11V11H9V13M13,13H15V11H13V13M9,17H11V15H9V17M13,17H15V15H13V17Z"/>
+                            </svg>
+                            <div class="export-title">CSV Format</div>
+                            <div class="export-description">Comma-separated with full details</div>
+                        </div>
+                        <div class="export-card" id="exportJson">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M5,3H7V5H5V10A2,2 0 0,1 3,8H1V6H3V3A2,2 0 0,1 5,1H7V3H5M19,3V1H21A2,2 0 0,1 23,3V6H21V8A2,2 0 0,1 19,10V5H17V3H19M5,21H7V19H5V14A2,2 0 0,1 3,16H1V18H3V21A2,2 0 0,1 5,23H7V21H5M19,21V23H21A2,2 0 0,1 23,21V18H21V16A2,2 0 0,1 19,14V19H17V21H19Z"/>
+                            </svg>
+                            <div class="export-title">JSON Format</div>
+                            <div class="export-description">Machine-readable structured data</div>
+                        </div>
+                        <div class="export-card" id="exportXml">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.89,3L14.85,3.4L11.11,21L9.15,20.6L12.89,3M19.59,12L16.76,9.17L18.17,7.76L22.41,12L18.17,16.24L16.76,14.83L19.59,12M4.41,12L7.24,14.83L5.83,16.24L1.59,12L5.83,7.76L7.24,9.17L4.41,12Z"/>
+                            </svg>
+                            <div class="export-title">XML Format</div>
+                            <div class="export-description">Structured markup format</div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Export Filter</label>
+                        <select class="setting-input" id="exportFilter">
+                            <option value="all">All Results</option>
+                            <option value="active">Only Active Subdomains</option>
+                            <option value="wayback">Wayback Machine Only</option>
+                            <option value="crtsh">Certificate Transparency Only</option>
+                            <option value="dns">DNS Brute Force Only</option>
+                            <option value="search">Search Engine Only</option>
+                            <option value="permute">Permutation Only</option>
+                            <option value="zone">Zone Transfer Only</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Include HTTP Status</label>
+                        <input type="checkbox" id="includeStatus" checked>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Include Page Titles</label>
+                        <input type="checkbox" id="includeTitles" checked>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Include Source Information</label>
+                        <input type="checkbox" id="includeSource" checked>
+                    </div>
+                </div>
             </div>
-            <div class="status-item">
-                <div class="status-indicator" id="crtshIndicator"></div>
-                <span>Certificate Transparency</span>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Integration Options</h3>
+                    <p class="settings-description">Export for popular security tools</p>
+                </div>
+                <div class="settings-content">
+                    <div class="export-options">
+                        <div class="export-card" id="exportNmap">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <div class="export-title">Nmap Targets</div>
+                            <div class="export-description">Format for Nmap port scanning</div>
+                        </div>
+                        <div class="export-card" id="exportMasscan">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M6,20H15L18,20V12L15,15L12,12L9,15L6,12V20Z"/>
+                            </svg>
+                            <div class="export-title">Masscan Format</div>
+                            <div class="export-description">High-speed port scanner format</div>
+                        </div>
+                        <div class="export-card" id="exportBurp">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                                <path d="M10.29,8.44L9.5,7A2.5,2.5 0 0,0 7,9.5H8.5A1,1 0 0,1 9.5,8.5V10L10.29,8.44Z"/>
+                            </svg>
+                            <div class="export-title">Burp Suite</div>
+                            <div class="export-description">Target scope for web testing</div>
+                        </div>
+                        <div class="export-card" id="exportAmass">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1L13.5,2.5L16.17,5.17L10.59,10.75C10.21,10.28 9.68,10 9,10C7.9,10 7,10.9 7,12C7,13.1 7.9,14 9,14C10.1,14 11,13.1 11,12C11,11.32 10.72,10.79 10.25,10.41L15.83,4.83L18.5,7.5L17,9H21M23,12L12,23L1,12H23Z"/>
+                            </svg>
+                            <div class="export-title">Amass Config</div>
+                            <div class="export-description">OWASP Amass configuration</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="status-item">
-                <div class="status-indicator" id="dnsIndicator"></div>
-                <span>DNS Brute Force</span>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>API Access</h3>
+                    <p class="settings-description">Programmatic access to scan results</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label class="setting-label">API Endpoint URLs</label>
+                        <div class="detail-value" style="margin-bottom: 1rem;">
+                            <div><strong>All Results:</strong> GET /api/results?target=example.com</div>
+                            <div><strong>By Source:</strong> GET /api/results/wayback?target=example.com</div>
+                            <div><strong>Live Stream:</strong> GET /api/wayback/stream?target=example.com</div>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <button class="btn secondary" id="generateApiKey">Generate API Key</button>
+                        <button class="btn secondary" id="viewApiDocs">View API Documentation</button>
+                    </div>
+                </div>
             </div>
-            <div class="status-item">
-                <div class="status-indicator" id="searchIndicator"></div>
-                <span>Search Engine</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator" id="permuteIndicator"></div>
-                <span>Permutation</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator" id="zoneIndicator"></div>
-                <span>Zone Transfer</span>
-            </div>
-        </div>
-        <div class="status-item">
-            <span id="statusText">Ready to scan</span>
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">Wayback Machine</span>
-                    <span class="source-counter" id="waybackCounter">0</span>
+    <!-- Metrics Tab -->
+    <div class="tab-content" id="metrics-tab">
+        <div class="control-panel">
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>System Metrics</h3>
+                    <p class="settings-description">Real-time performance and usage statistics</p>
                 </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copyWayback">Copy All</button>
+                <div class="settings-content">
+                    <div class="export-options">
+                        <div class="export-card" id="viewStats">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/>
+                            </svg>
+                            <div class="export-title">View Statistics</div>
+                            <div class="export-description">JSON formatted system statistics</div>
+                        </div>
+                        <div class="export-card" id="viewMetrics">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9,17H7V10H9V17M13,17H11V7H13V17M17,17H15V13H17V17M19.5,19.1H4.5V5.1H19.5V19.1M19.5,3H4.5C3.4,3 2.5,3.9 2.5,5V19C2.5,20.1 3.4,21 4.5,21H19.5C20.6,21 21.5,20.1 21.5,19V5C21.5,3.9 20.6,3 19.5,3Z"/>
+                            </svg>
+                            <div class="export-title">Prometheus Metrics</div>
+                            <div class="export-description">Raw metrics in Prometheus format</div>
+                        </div>
+                        <div class="export-card" id="healthCheck">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10.5,13H8V10.5C8,9.1 6.9,8 5.5,8S3,9.1 3,10.5V16H10.5C11.9,16 13,14.9 13,13.5S11.9,11 10.5,11M21.5,6H18.5V9H21.5C22.3,9 23,8.3 23,7.5S22.3,6 21.5,6M13.5,10.5V13.5H16V16C16,17.1 16.9,18 18,18S20,17.1 20,16V13.5C20,12.1 18.9,11 17.5,11H13.5V10.5C13.5,9.1 12.4,8 11,8S8.5,9.1 8.5,10.5V13H11C12.4,13 13.5,11.9 13.5,10.5Z"/>
+                            </svg>
+                            <div class="export-title">Health Check</div>
+                            <div class="export-description">System health and readiness status</div>
+                        </div>
+                        <div class="export-card" id="refreshMetrics">
+                            <svg class="export-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                            </svg>
+                            <div class="export-title">Refresh Data</div>
+                            <div class="export-description">Update metrics and statistics</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="results-container" id="waybackResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Live Statistics Dashboard</h3>
+                    <p class="settings-description">Real-time system performance metrics</p>
+                </div>
+                <div class="settings-content">
+                    <div id="metricsDisplay" style="background: var(--bg-primary); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-primary);">
+                        <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5; margin-bottom: 1rem;">
+                                <path d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z"/>
+                            </svg>
+                            <p>Click "View Statistics" to load system metrics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Monitoring Endpoints</h3>
+                    <p class="settings-description">Direct access to monitoring and metrics endpoints</p>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Available Endpoints</label>
+                        <div class="detail-value">
+                            <div style="margin-bottom: 0.5rem;"><strong>Statistics:</strong> <a href="/api/stats" target="_blank" style="color: var(--accent-primary);">GET /api/stats</a></div>
+                            <div style="margin-bottom: 0.5rem;"><strong>Prometheus Metrics:</strong> <a href="/metrics" target="_blank" style="color: var(--accent-primary);">GET /metrics</a></div>
+                            <div style="margin-bottom: 0.5rem;"><strong>Health Check:</strong> <a href="/health" target="_blank" style="color: var(--accent-primary);">GET /health</a></div>
+                            <div style="margin-bottom: 0.5rem;"><strong>Readiness Probe:</strong> <a href="/ready" target="_blank" style="color: var(--accent-primary);">GET /ready</a></div>
+                            <div><strong>Configuration:</strong> <a href="/api/config" target="_blank" style="color: var(--accent-primary);">GET /api/config</a></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="setting-label">Metrics Server Status</label>
+                        <div class="detail-value" id="metricsServerStatus">
+                            <span style="color: var(--text-muted);">Checking server status...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">Certificate Transparency</span>
-                    <span class="source-counter" id="crtshCounter">0</span>
+    <!-- Help Tab -->
+    <div class="tab-content" id="help-tab">
+        <div class="control-panel">
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Discovery Methods</h3>
+                    <p class="settings-description">Understanding each subdomain discovery technique</p>
                 </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copyCrtsh">Copy All</button>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21.71,11.29L12,1.58L2.29,11.29A1,1 0 0,0 2,12A1,1 0 0,0 3,13H4V19A2,2 0 0,0 6,21H18A2,2 0 0,0 20,19V13H21A1,1 0 0,0 22,12A1,1 0 0,0 21.71,11.29M16,4.41L18.59,7H16V4.41M6,19V9H18V19H6Z"/>
+                            </svg>
+                            Wayback Machine
+                        </h4>
+                        <p style="color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                            Searches Internet Archive's historical web crawl data to discover subdomains from archived URLs. 
+                            Excellent for finding old or deprecated subdomains that may still be active.
+                        </p>
+                        <div class="detail-value">
+                            <strong>Timeout:</strong> 5 minutes | <strong>Source:</strong> web.archive.org
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 16,11V16H8V11C9.2,8.6 10.6,7 12,7Z"/>
+                            </svg>
+                            Certificate Transparency
+                        </h4>
+                        <p style="color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                            Queries public SSL/TLS certificate logs to find subdomains from certificate Subject Alternative Names. 
+                            Great for discovering active HTTPS subdomains.
+                        </p>
+                        <div class="detail-value">
+                            <strong>Timeout:</strong> 5 minutes | <strong>Source:</strong> crt.sh
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16.36,14C16.44,13.34 16.5,12.68 16.5,12C16.5,11.32 16.44,10.66 16.36,10H19.74C19.9,10.64 20,11.31 20,12C20,12.69 19.9,13.36 19.74,14M14.59,19.56C15.19,18.45 15.65,17.25 15.97,16H18.92C17.96,17.65 16.43,18.93 14.59,19.56M14.34,14H9.66C9.56,13.34 9.5,12.68 9.5,12C9.5,11.32 9.56,10.65 9.66,10H14.34C14.43,10.65 14.5,11.32 14.5,12C14.5,12.68 14.43,13.34 14.34,14M12,19.96C11.17,18.76 10.5,17.43 10.09,16H13.91C13.5,17.43 12.83,18.76 12,19.96M8,8H5.08C6.03,6.34 7.57,5.06 9.4,4.44C8.8,5.55 8.35,6.75 8,8M5.08,16H8C8.35,17.25 8.8,18.45 9.4,19.56C7.57,18.93 6.03,17.65 5.08,16M4.26,14C4.1,13.36 4,12.69 4,12C4,11.31 4.1,10.64 4.26,10H7.64C7.56,10.66 7.5,11.32 7.5,12C7.5,12.68 7.56,13.34 7.64,14M12,4.03C12.83,5.23 13.5,6.57 13.91,8H10.09C10.5,6.57 11.17,5.23 12,4.03M18.92,8H15.97C15.65,6.75 15.19,5.55 14.59,4.44C16.43,5.07 17.96,6.34 18.92,8M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                            </svg>
+                            DNS Brute Force
+                        </h4>
+                        <p style="color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                            Tests 500+ common subdomain patterns using multiple DNS servers with concurrent resolution. 
+                            Most reliable method for finding active subdomains.
+                        </p>
+                        <div class="detail-value">
+                            <strong>Timeout:</strong> 10 minutes | <strong>Concurrency:</strong> 50 queries
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                            </svg>
+                            Search Engine Scraping
+                        </h4>
+                        <p style="color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                            Automated Google search with "site:" operator to extract subdomains from search results. 
+                            Respects search engine rate limits.
+                        </p>
+                        <div class="detail-value">
+                            <strong>Timeout:</strong> 5 minutes | <strong>Note:</strong> Rate limited
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="results-container" id="crtshResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">DNS Brute Force</span>
-                    <span class="source-counter" id="dnsCounter">0</span>
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Best Practices</h3>
+                    <p class="settings-description">Tips for effective subdomain enumeration</p>
                 </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copyDns">Copy All</button>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+                            </svg>
+                            Target Selection
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Only scan domains you own or have explicit permission to test</li>
+                            <li>Start with passive methods (Wayback, Certificate Transparency) first</li>
+                            <li>Use active methods (DNS, Search) for comprehensive discovery</li>
+                            <li>Consider rate limits and respect robots.txt</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/>
+                                <path d="M8,12V14H16V12H8M16,16H8V18H16V16Z"/>
+                            </svg>
+                            Performance Optimization
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Adjust DNS concurrency based on your network capacity</li>
+                            <li>Use shorter timeouts for faster scanning</li>
+                            <li>Enable HTTPS-first probing for modern domains</li>
+                            <li>Monitor resource usage during large scans</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22.7 19L13.6 9.9C14.5 7.6 14 4.9 12.1 3C10.1 1 7.1 0.6 4.7 1.7L9 6L6 9L1.6 4.7C0.4 7.1 0.9 10.1 2.9 12.1C4.8 14 7.5 14.5 9.8 13.6L18.9 22.7C19.3 23.1 19.9 23.1 20.3 22.7L22.6 20.4C23.1 20 23.1 19.3 22.7 19Z"/>
+                            </svg>
+                            Advanced Usage
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Combine multiple sources for comprehensive coverage</li>
+                            <li>Export results for integration with other security tools</li>
+                            <li>Use custom wordlists for target-specific patterns</li>
+                            <li>Set up API access for automated workflows</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="results-container" id="dnsResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">Search Engine</span>
-                    <span class="source-counter" id="searchCounter">0</span>
+            <div class="settings-section">
+                <div class="settings-header">
+                    <h3>Troubleshooting</h3>
+                    <p class="settings-description">Common issues and solutions</p>
                 </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copySearch">Copy All</button>
-                </div>
-            </div>
-            <div class="results-container" id="searchResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">Permutation</span>
-                    <span class="source-counter" id="permuteCounter">0</span>
-                </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copyPermute">Copy All</button>
-                </div>
-            </div>
-            <div class="results-container" id="permuteResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="source-panel">
-            <div class="source-header">
-                <div class="source-title-section">
-                    <span class="source-title">Zone Transfer</span>
-                    <span class="source-counter" id="zoneCounter">0</span>
-                </div>
-                <div class="source-actions">
-                    <button class="btn copy" id="copyZone">Copy All</button>
-                </div>
-            </div>
-            <div class="results-container" id="zoneResults">
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                    <span>Waiting for scan to start...</span>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-warning); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
+                            </svg>
+                            No Results Found
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Verify domain name is spelled correctly</li>
+                            <li>Check internet connectivity</li>
+                            <li>Try different source combinations</li>
+                            <li>Some APIs may be temporarily unavailable</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-warning); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M15.5,8A1.5,1.5 0 0,1 17,9.5A1.5,1.5 0 0,1 15.5,11A1.5,1.5 0 0,1 14,9.5A1.5,1.5 0 0,1 15.5,8M10,9.5C10,10.6 9.6,11.6 8.9,12.3C8.3,12.9 7.4,13.1 6.5,13.1C5.6,13.1 4.7,12.9 4.1,12.3C3.4,11.6 3,10.6 3,9.5C3,8.4 3.4,7.4 4.1,6.7C4.7,6.1 5.6,5.9 6.5,5.9C7.4,5.9 8.3,6.1 8.9,6.7C9.6,7.4 10,8.4 10,9.5Z"/>
+                            </svg>
+                            Slow Performance
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Reduce DNS concurrency settings</li>
+                            <li>Increase timeout values for unstable connections</li>
+                            <li>Disable resource-intensive sources temporarily</li>
+                            <li>Check system resource usage</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4 style="color: var(--accent-error); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+                            </svg>
+                            Connection Errors
+                        </h4>
+                        <ul style="color: var(--text-muted); line-height: 1.6; margin-left: 1.5rem;">
+                            <li>Check firewall settings for outbound connections</li>
+                            <li>Verify DNS server accessibility</li>
+                            <li>Try different DNS servers if queries fail</li>
+                            <li>Ensure port 8080 is available for the web interface</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -870,7 +1616,7 @@
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status Code</div>
-                    <div class="detail-value status" id="modalStatus"></div>
+                    <div class="detail-value" id="modalStatus"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Title</div>
@@ -878,39 +1624,115 @@
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Error</div>
-                    <div class="detail-value error" id="modalError"></div>
+                    <div class="detail-value" id="modalError"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        class AdvancedSubdomainScanner {
+        class EnhancedSubdomainScanner {
             constructor() {
                 this.eventSources = {};
                 this.isScanning = false;
                 this.startTime = null;
                 this.timerInterval = null;
+                this.currentView = 'all';
                 this.counters = {
-                    wayback: 0,
-                    crtsh: 0,
-                    dns: 0,
-                    search: 0,
-                    permute: 0,
-                    zone: 0,
-                    total: 0
+                    wayback: 0, crtsh: 0, dns: 0, search: 0, permute: 0, zone: 0, total: 0, probes: 0
                 };
                 this.results = {
-                    wayback: [],
-                    crtsh: [],
-                    dns: [],
-                    search: [],
-                    permute: [],
-                    zone: []
+                    wayback: [], crtsh: [], dns: [], search: [], permute: [], zone: []
                 };
                 this.activeSources = 0;
+                this.settings = this.loadSettings();
                 
                 this.initializeEventListeners();
+                this.initializeTabs();
+                this.applySettings();
+            }
+
+            loadSettings() {
+                const defaultSettings = {
+                    timeouts: { wayback: 5, crtsh: 5, dns: 10, search: 5, permute: 10, zone: 2 },
+                    performance: { dnsConcurrency: 50, probeTimeout: 10, httpsFirst: true },
+                    dns: { primary: '8.8.8.8', secondary: '8.8.4.4' },
+                    customWordlist: ''
+                };
+                
+                try {
+                    const saved = JSON.parse(localStorage.getItem('subdomainScanner.settings') || '{}');
+                    return { ...defaultSettings, ...saved };
+                } catch {
+                    return defaultSettings;
+                }
+            }
+
+            saveSettings() {
+                try {
+                    localStorage.setItem('subdomainScanner.settings', JSON.stringify(this.settings));
+                } catch (e) {
+                    console.warn('Could not save settings:', e);
+                }
+            }
+
+            applySettings() {
+                // Apply timeout settings to UI
+                document.getElementById('waybackTimeout').value = this.settings.timeouts.wayback;
+                document.getElementById('crtshTimeout').value = this.settings.timeouts.crtsh;
+                document.getElementById('dnsTimeout').value = this.settings.timeouts.dns;
+                document.getElementById('searchTimeout').value = this.settings.timeouts.search;
+                
+                // Apply performance settings
+                document.getElementById('dnsConcurrency').value = this.settings.performance.dnsConcurrency;
+                document.getElementById('probeTimeout').value = this.settings.performance.probeTimeout;
+                document.getElementById('httpsFirst').checked = this.settings.performance.httpsFirst;
+                
+                // Apply DNS settings
+                document.getElementById('primaryDns').value = this.settings.dns.primary;
+                document.getElementById('secondaryDns').value = this.settings.dns.secondary;
+                
+                // Apply custom wordlist
+                document.getElementById('customWordlist').value = this.settings.customWordlist;
+            }
+
+            collectSettings() {
+                this.settings = {
+                    timeouts: {
+                        wayback: parseInt(document.getElementById('waybackTimeout').value),
+                        crtsh: parseInt(document.getElementById('crtshTimeout').value),
+                        dns: parseInt(document.getElementById('dnsTimeout').value),
+                        search: parseInt(document.getElementById('searchTimeout').value)
+                    },
+                    performance: {
+                        dnsConcurrency: parseInt(document.getElementById('dnsConcurrency').value),
+                        probeTimeout: parseInt(document.getElementById('probeTimeout').value),
+                        httpsFirst: document.getElementById('httpsFirst').checked
+                    },
+                    dns: {
+                        primary: document.getElementById('primaryDns').value,
+                        secondary: document.getElementById('secondaryDns').value
+                    },
+                    customWordlist: document.getElementById('customWordlist').value
+                };
+                this.saveSettings();
+            }
+
+            initializeTabs() {
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        tab.classList.add('active');
+                        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                        
+                        // Initialize metrics tab when activated
+                        if (tab.dataset.tab === 'metrics') {
+                            this.checkMetricsServerStatus();
+                        }
+                    });
+                });
             }
 
             initializeEventListeners() {
@@ -932,13 +1754,49 @@
                         toggle.classList.toggle('active', checkbox.checked);
                     });
                 });
-                
-                // Copy buttons
-                const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
-                sources.forEach(source => {
-                    document.getElementById(`copy${source.charAt(0).toUpperCase() + source.slice(1)}`).addEventListener('click', () => this.copyResults(source));
+
+                // Source filter in sidebar
+                document.querySelectorAll('.source-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.source-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        this.currentView = item.dataset.source;
+                        this.updateResultsView();
+                    });
                 });
-                
+
+                // Results actions
+                document.getElementById('copyCurrentBtn').addEventListener('click', () => this.copyCurrentView());
+                document.getElementById('exportCurrentBtn').addEventListener('click', () => this.exportCurrentView());
+
+                // Settings event listeners
+                document.getElementById('saveWordlistBtn').addEventListener('click', () => {
+                    this.collectSettings();
+                    this.showNotification('Custom wordlist saved successfully', 'success');
+                });
+
+                document.getElementById('resetWordlistBtn').addEventListener('click', () => {
+                    document.getElementById('customWordlist').value = '';
+                    this.collectSettings();
+                    this.showNotification('Wordlist reset to default', 'success');
+                });
+
+                // Export handlers
+                document.getElementById('exportTxt').addEventListener('click', () => this.exportAs('txt'));
+                document.getElementById('exportCsv').addEventListener('click', () => this.exportAs('csv'));
+                document.getElementById('exportJson').addEventListener('click', () => this.exportAs('json'));
+                document.getElementById('exportXml').addEventListener('click', () => this.exportAs('xml'));
+                document.getElementById('exportNmap').addEventListener('click', () => this.exportAs('nmap'));
+                document.getElementById('exportMasscan').addEventListener('click', () => this.exportAs('masscan'));
+                document.getElementById('exportBurp').addEventListener('click', () => this.exportAs('burp'));
+                document.getElementById('exportAmass').addEventListener('click', () => this.exportAs('amass'));
+
+                // Metrics handlers
+                document.getElementById('viewStats').addEventListener('click', () => this.loadStatistics());
+                document.getElementById('viewMetrics').addEventListener('click', () => this.viewPrometheusMetrics());
+                document.getElementById('healthCheck').addEventListener('click', () => this.checkHealth());
+                document.getElementById('refreshMetrics').addEventListener('click', () => this.refreshMetrics());
+
                 // Modal events
                 document.querySelector('.close').addEventListener('click', () => this.closeModal());
                 document.getElementById('detailModal').addEventListener('click', (e) => {
@@ -946,7 +1804,14 @@
                         this.closeModal();
                     }
                 });
-                
+
+                // Auto-save settings on change
+                document.querySelectorAll('#settings-tab input, #settings-tab select, #settings-tab textarea').forEach(input => {
+                    input.addEventListener('change', () => {
+                        this.collectSettings();
+                    });
+                });
+
                 // Allow enter key to start scan
                 document.getElementById('domain').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' && !this.isScanning) {
@@ -962,20 +1827,19 @@
                     return;
                 }
 
-                // Stop any existing scan first
+                // Prevent starting multiple scans
                 if (this.isScanning) {
-                    this.stopScan();
-                    setTimeout(() => this.startScan(), 1000);
+                    this.showNotification('A scan is already in progress. Stop it first to start a new one.', 'warning');
                     return;
                 }
 
+                this.collectSettings(); // Ensure latest settings are applied
                 this.isScanning = true;
                 this.startTime = Date.now();
                 this.resetUI();
                 this.updateButtons();
                 this.startTimer();
 
-                // Get enabled sources
                 const enabledSources = this.getEnabledSources();
                 if (enabledSources.length === 0) {
                     this.showNotification('Please select at least one source', 'error');
@@ -983,25 +1847,29 @@
                     return;
                 }
 
-                // Start streams for enabled sources
                 enabledSources.forEach(source => {
                     this.startStream(source, domain);
                 });
 
-                document.getElementById('statusText').textContent = `Scanning ${domain}...`;
+                this.showNotification(`Started scanning ${domain} with ${enabledSources.length} sources`, 'success');
             }
 
             stopScan() {
+                if (!this.isScanning) {
+                    return;
+                }
+
                 this.isScanning = false;
                 this.updateButtons();
                 this.stopStreams();
                 this.stopTimer();
                 
-                // Hit abort endpoint
                 const domain = document.getElementById('domain').value.trim();
-                fetch(`/api/abort?target=${encodeURIComponent(domain)}`, { method: 'POST' }).catch(console.error);
+                if (domain) {
+                    fetch(`/api/abort?target=${encodeURIComponent(domain)}`, { method: 'POST' }).catch(console.error);
+                }
                 
-                document.getElementById('statusText').textContent = 'Scan stopped';
+                this.showNotification('Scan stopped', 'warning');
             }
 
             getEnabledSources() {
@@ -1025,45 +1893,68 @@
             }
 
             resetUI() {
-                this.counters = { wayback: 0, crtsh: 0, dns: 0, search: 0, permute: 0, zone: 0, total: 0 };
+                this.counters = { wayback: 0, crtsh: 0, dns: 0, search: 0, permute: 0, zone: 0, total: 0, probes: 0 };
                 this.results = { wayback: [], crtsh: [], dns: [], search: [], permute: [], zone: [] };
                 this.activeSources = 0;
                 this.updateCounters();
                 this.updateStats();
+                this.updateResultsView();
                 
-                // Clear results
+                // Reset status dots
                 const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
                 sources.forEach(source => {
-                    const container = document.getElementById(`${source}Results`);
-                    container.innerHTML = '<div class="empty-state"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><span>Waiting for scan to start...</span></div>';
-                    document.getElementById(`${source}Indicator`).classList.remove('active', 'finished');
+                    const dot = document.getElementById(`${source}Dot`);
+                    if (dot) {
+                        dot.classList.remove('active', 'finished');
+                    }
                 });
             }
 
             startStream(source, domain) {
+                // Prevent duplicate streams
+                if (this.eventSources[source]) {
+                    console.log(`${source} stream already running, skipping`);
+                    return;
+                }
+
                 const eventSource = new EventSource(`/api/${source}/stream?target=${encodeURIComponent(domain)}`);
                 this.eventSources[source] = eventSource;
                 
-                const indicator = document.getElementById(`${source}Indicator`);
-                indicator.classList.add('active');
+                const dot = document.getElementById(`${source}Dot`);
+                if (dot) {
+                    dot.classList.add('active');
+                }
                 this.activeSources++;
                 this.updateStats();
                 
                 eventSource.onmessage = (event) => {
                     const host = event.data.trim();
-                    if (host) {
+                    if (host && !host.startsWith('info:') && !host.startsWith('status:') && !host.startsWith('error:')) {
                         this.probeHost(host, source);
                     }
                 };
+
+                // Handle completion events
+                eventSource.addEventListener('complete', (event) => {
+                    console.log(`${source} completed:`, event.data);
+                    this.completeSource(source);
+                });
                 
-                eventSource.onerror = () => {
-                    indicator.classList.remove('active');
-                    indicator.classList.add('finished');
-                    this.activeSources--;
-                    this.updateStats();
-                    
-                    if (this.activeSources === 0 && this.isScanning) {
-                        this.finishScan();
+                eventSource.onerror = (event) => {
+                    console.log(`${source} stream error or ended:`, event);
+                    // Only treat as error if the readyState indicates an actual error
+                    if (eventSource.readyState === EventSource.CLOSED) {
+                        // Stream closed - this is normal completion
+                        this.completeSource(source);
+                    } else if (eventSource.readyState === EventSource.CONNECTING) {
+                        // EventSource is trying to reconnect, close it to prevent infinite reconnection
+                        console.log(`${source} trying to reconnect, preventing...`);
+                        eventSource.close();
+                        this.completeSource(source);
+                    } else {
+                        // Actual error
+                        console.error(`${source} stream error:`, event);
+                        this.completeSource(source);
                     }
                 };
                 
@@ -1072,92 +1963,175 @@
                 };
             }
 
+            completeSource(source) {
+                // Prevent race conditions
+                if (!this.eventSources[source]) {
+                    return; // Already completed
+                }
+
+                // Close the event source to prevent reconnection
+                this.eventSources[source].close();
+                delete this.eventSources[source];
+
+                const dot = document.getElementById(`${source}Dot`);
+                if (dot) {
+                    dot.classList.remove('active');
+                    dot.classList.add('finished');
+                }
+                
+                this.activeSources = Math.max(0, this.activeSources - 1); // Prevent negative values
+                this.updateStats();
+                
+                console.log(`${source} completed. Active sources remaining: ${this.activeSources}`);
+                
+                // Check if all sources are complete
+                if (this.activeSources === 0 && this.isScanning) {
+                    this.finishScan();
+                }
+            }
+
             stopStreams() {
+                // Close all event sources to prevent reconnection
                 Object.entries(this.eventSources).forEach(([source, eventSource]) => {
                     if (eventSource) {
+                        console.log(`Closing ${source} stream`);
                         eventSource.close();
-                        const indicator = document.getElementById(`${source}Indicator`);
-                        indicator.classList.remove('active');
-                        indicator.classList.add('finished');
+                        const dot = document.getElementById(`${source}Dot`);
+                        if (dot) {
+                            dot.classList.remove('active');
+                            dot.classList.add('finished');
+                        }
                     }
                 });
+                
+                // Clear the eventSources object
                 this.eventSources = {};
                 this.activeSources = 0;
                 this.updateStats();
             }
 
             finishScan() {
+                if (!this.isScanning) {
+                    return; // Already finished
+                }
+
                 this.isScanning = false;
                 this.updateButtons();
                 this.stopTimer();
-                document.getElementById('statusText').textContent = `Scan completed - ${this.counters.total} subdomains discovered`;
-                this.showNotification(`Scan completed! Found ${this.counters.total} subdomains`, 'success');
+                
+                // Ensure all streams are closed
+                this.stopStreams();
+                
+                const scanDuration = this.startTime ? Math.floor((Date.now() - this.startTime) / 1000) : 0;
+                const minutes = Math.floor(scanDuration / 60);
+                const seconds = scanDuration % 60;
+                const duration = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+                
+                this.showNotification(
+                    `Scan completed! Found ${this.counters.total} subdomains in ${duration}`, 
+                    'success'
+                );
+                
+                console.log('Scan completed:', {
+                    total: this.counters.total,
+                    duration: duration,
+                    sources: this.counters
+                });
             }
 
             addResult(source, data) {
-                const container = document.getElementById(`${source}Results`);
-                
-                // Remove empty state if it exists
-                const emptyState = container.querySelector('.empty-state');
-                if (emptyState) {
-                    emptyState.remove();
-                }
-
                 // Check for duplicates
                 const existingResult = this.results[source].find(r => r.Host === data.Host);
                 if (existingResult) {
-                    return; // Skip duplicates
+                    return;
                 }
 
-                // Add to results array
                 this.results[source].push(data);
-                
-                const resultItem = document.createElement('div');
-                resultItem.className = 'result-item';
-                resultItem.setAttribute('data-host', data.Host);
-                
-                const status = data.Status || 'Probing...';
-                const title = data.Title || 'Subdomain discovered';
-                
-                resultItem.innerHTML = `
-                    <div class="result-host">
-                        ${data.Host}
-                        <a href="https://${data.Host}" target="_blank" class="nav-arrow" title="Visit site">↗</a>
-                    </div>
-                    <div class="result-details">
-                        <span class="result-status">${status}</span>
-                        <span class="result-title" title="${title}">${title}</span>
-                    </div>
-                `;
-                
-                // Add click listener for modal
-                resultItem.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('nav-arrow')) return;
-                    this.showModal(data);
-                });
-                
-                container.insertBefore(resultItem, container.firstChild);
-                
-                // Update counters
                 this.counters[source]++;
                 this.counters.total++;
                 this.updateCounters();
                 this.updateStats();
-                
-                // Scroll to top to show new result  
-                container.scrollTop = 0;
+                this.updateResultsView();
             }
 
             updateCounters() {
                 const sources = ['wayback', 'crtsh', 'dns', 'search', 'permute', 'zone'];
                 sources.forEach(source => {
-                    document.getElementById(`${source}Counter`).textContent = this.counters[source];
+                    const counter = document.getElementById(`${source}Counter`);
+                    const count = document.getElementById(`${source}Count`);
+                    if (counter) counter.textContent = this.counters[source];
+                    if (count) count.textContent = `${this.counters[source]} found`;
                 });
+                
+                document.getElementById('allResultsCount').textContent = `${this.counters.total} found`;
             }
 
             updateStats() {
                 document.getElementById('totalCount').textContent = this.counters.total;
                 document.getElementById('activeCount').textContent = this.activeSources;
+                document.getElementById('probeCount').textContent = this.counters.probes;
+            }
+
+            updateResultsView() {
+                const container = document.getElementById('mainResults');
+                const title = document.getElementById('currentViewTitle');
+                
+                let resultsToShow = [];
+                if (this.currentView === 'all') {
+                    title.textContent = 'All Results';
+                    Object.values(this.results).forEach(sourceResults => {
+                        resultsToShow = resultsToShow.concat(sourceResults);
+                    });
+                } else {
+                    const sourceName = this.currentView.charAt(0).toUpperCase() + this.currentView.slice(1);
+                    title.textContent = `${sourceName} Results`;
+                    resultsToShow = this.results[this.currentView] || [];
+                }
+
+                // Sort by most recent first
+                resultsToShow.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                if (resultsToShow.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <span>${this.isScanning ? 'Waiting for results...' : 'No results found'}</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = resultsToShow.map(result => {
+                    const status = result.Status || 'Probing...';
+                    const title = result.Title || 'Subdomain discovered';
+                    const statusClass = status === 'Probing...' ? '' : (status.startsWith('2') || status.startsWith('3') ? 'success' : 'error');
+                    
+                    return `
+                        <div class="result-item" data-host="${result.Host}">
+                            <div class="result-host">
+                                ${result.Host}
+                                <a href="${result.TriedURL || 'https://' + result.Host}" target="_blank" class="nav-arrow" title="Visit site">↗</a>
+                            </div>
+                            <div class="result-details">
+                                <span class="result-status ${statusClass}">${status}</span>
+                                <span class="result-title" title="${title}">${title}</span>
+                                <span style="color: var(--text-muted); font-size: 0.75rem;">${result.Source || 'Unknown'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Add click listeners for modals
+                container.querySelectorAll('.result-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('nav-arrow')) return;
+                        const host = item.dataset.host;
+                        const result = resultsToShow.find(r => r.Host === host);
+                        if (result) this.showModal(result);
+                    });
+                });
             }
 
             updateButtons() {
@@ -1165,7 +2139,6 @@
                 document.getElementById('stopBtn').disabled = !this.isScanning;
                 document.getElementById('domain').disabled = this.isScanning;
                 
-                // Disable source toggles during scan
                 document.querySelectorAll('.source-toggle input').forEach(input => {
                     input.disabled = this.isScanning;
                 });
@@ -1189,89 +2162,19 @@
                 }
             }
 
-            copyResults(source) {
-                const hosts = this.results[source].map(r => r.Host).join('\n');
-                if (hosts) {
-                    navigator.clipboard.writeText(hosts).then(() => {
-                        this.showNotification(`Copied ${this.results[source].length} ${source} hosts`, 'success');
-                    }).catch(err => {
-                        console.error('Failed to copy:', err);
-                        this.showNotification('Failed to copy to clipboard', 'error');
-                    });
-                } else {
-                    this.showNotification('No hosts to copy', 'warning');
-                }
-            }
-
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = 'copy-notification';
-                notification.textContent = message;
-                
-                // Add type-specific styling
-                if (type === 'error') {
-                    notification.style.background = '#2a1a1a';
-                    notification.style.color = '#ff6b6b';
-                    notification.style.borderColor = '#ff6b6b';
-                } else if (type === 'success') {
-                    notification.style.background = '#1a2a1a';
-                    notification.style.color = '#4ade80';
-                    notification.style.borderColor = '#4ade80';
-                } else if (type === 'warning') {
-                    notification.style.background = '#2a2a1a';
-                    notification.style.color = '#fbbf24';
-                    notification.style.borderColor = '#fbbf24';
-                }
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.remove();
-                }, 4000);
-            }
-
-            showModal(data) {
-                document.getElementById('modalTitle').textContent = data.Host;
-                document.getElementById('modalHost').textContent = data.Host;
-                document.getElementById('modalSource').textContent = data.Source || 'Unknown';
-                document.getElementById('modalTriedURL').textContent = data.TriedURL || 'Not probed yet';
-                
-                const statusEl = document.getElementById('modalStatus');
-                statusEl.textContent = data.Status || 'Probing...';
-                statusEl.className = 'detail-value status ' + (data.Status && data.Status !== 'Probing...' && data.Status !== 'Failed' ? 'success' : 'error');
-                
-                document.getElementById('modalTitleValue').textContent = data.Title || 'No title available';
-                
-                const errorEl = document.getElementById('modalError');
-                if (data.Err && data.Err.trim()) {
-                    errorEl.textContent = data.Err;
-                    errorEl.style.display = 'block';
-                } else {
-                    errorEl.textContent = 'No errors';
-                    errorEl.style.display = 'block';
-                }
-                
-                document.getElementById('detailModal').style.display = 'block';
-            }
-
-            closeModal() {
-                document.getElementById('detailModal').style.display = 'none';
-            }
-
             async probeHost(host, source) {
-                // First add the host with "Probing..." status
                 const initialResult = { 
                     Host: host, 
                     Status: 'Probing...', 
                     Title: 'Subdomain discovered',
                     TriedURL: '',
                     Err: '',
-                    Source: source
+                    Source: source,
+                    timestamp: Date.now()
                 };
                 this.addResult(source, initialResult);
 
-                // Try HTTPS first, then HTTP
-                const protocols = ['https', 'http'];
+                const protocols = this.settings.performance.httpsFirst ? ['https', 'http'] : ['http', 'https'];
                 let finalResult = { ...initialResult };
 
                 for (const protocol of protocols) {
@@ -1286,61 +2189,469 @@
                             finalResult.Status = probeData.status;
                             finalResult.Title = probeData.title || 'No title';
                             finalResult.Err = probeData.error || '';
-                            break; // Success, stop trying other protocols
+                            this.counters.probes++;
+                            break;
                         }
                     } catch (error) {
                         finalResult.Err = `Probe failed: ${error.message}`;
                     }
                 }
 
-                // If both protocols failed, mark as failed
                 if (finalResult.Status === 'Probing...') {
                     finalResult.Status = 'Failed';
                     finalResult.Title = 'Connection failed';
                     finalResult.Err = finalResult.Err || 'No response from host';
                 }
 
-                // Update the result with probing information
                 this.updateResult(source, host, finalResult);
             }
 
             updateResult(source, host, newData) {
-                // Update in results array
                 const resultIndex = this.results[source].findIndex(r => r.Host === host);
                 if (resultIndex !== -1) {
                     this.results[source][resultIndex] = newData;
+                    this.updateResultsView();
+                    this.updateStats();
+                }
+            }
+
+            copyCurrentView() {
+                let results = [];
+                if (this.currentView === 'all') {
+                    Object.values(this.results).forEach(sourceResults => {
+                        results = results.concat(sourceResults);
+                    });
+                } else {
+                    results = this.results[this.currentView] || [];
                 }
 
-                // Update in DOM
-                const container = document.getElementById(`${source}Results`);
-                const existingItem = container.querySelector(`[data-host="${host}"]`);
-                if (existingItem) {
-                    const status = newData.Status || 'Unknown';
-                    const title = newData.Title || 'No title';
+                const hosts = results.map(r => r.Host).join('\n');
+                if (hosts) {
+                    navigator.clipboard.writeText(hosts).then(() => {
+                        this.showNotification(`Copied ${results.length} hosts from ${this.currentView}`, 'success');
+                    }).catch(err => {
+                        console.error('Failed to copy:', err);
+                        this.showNotification('Failed to copy to clipboard', 'error');
+                    });
+                } else {
+                    this.showNotification('No hosts to copy', 'warning');
+                }
+            }
+
+            exportCurrentView() {
+                // Redirect to export tab
+                document.querySelector('[data-tab="export"]').click();
+                this.showNotification('Switched to Export tab for more options', 'success');
+            }
+
+            exportAs(format) {
+                const filter = document.getElementById('exportFilter').value;
+                const includeStatus = document.getElementById('includeStatus').checked;
+                const includeTitles = document.getElementById('includeTitles').checked;
+                const includeSource = document.getElementById('includeSource').checked;
+
+                let results = [];
+                if (filter === 'all') {
+                    Object.values(this.results).forEach(sourceResults => {
+                        results = results.concat(sourceResults);
+                    });
+                } else if (filter === 'active') {
+                    Object.values(this.results).forEach(sourceResults => {
+                        results = results.concat(sourceResults.filter(r => 
+                            r.Status && !r.Status.includes('Failed') && !r.Status.includes('Probing')
+                        ));
+                    });
+                } else {
+                    results = this.results[filter] || [];
+                }
+
+                if (results.length === 0) {
+                    this.showNotification('No results to export', 'warning');
+                    return;
+                }
+
+                let exportData = '';
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                let filename = `subdomains_${timestamp}`;
+
+                switch (format) {
+                    case 'txt':
+                        exportData = results.map(r => r.Host).join('\n');
+                        filename += '.txt';
+                        break;
                     
-                    existingItem.innerHTML = `
-                        <div class="result-host">
-                            ${newData.Host}
-                            <a href="${newData.TriedURL || 'https://' + newData.Host}" target="_blank" class="nav-arrow" title="Visit site">↗</a>
+                    case 'csv':
+                        const headers = ['Host'];
+                        if (includeSource) headers.push('Source');
+                        if (includeStatus) headers.push('Status');
+                        if (includeTitles) headers.push('Title');
+                        headers.push('URL');
+                        
+                        exportData = headers.join(',') + '\n';
+                        exportData += results.map(r => {
+                            const row = [r.Host];
+                            if (includeSource) row.push(r.Source || '');
+                            if (includeStatus) row.push(r.Status || '');
+                            if (includeTitles) row.push(`"${(r.Title || '').replace(/"/g, '""')}"`);
+                            row.push(r.TriedURL || '');
+                            return row.join(',');
+                        }).join('\n');
+                        filename += '.csv';
+                        break;
+                    
+                    case 'json':
+                        exportData = JSON.stringify({
+                            metadata: {
+                                timestamp: new Date().toISOString(),
+                                total: results.length,
+                                filters: { includeStatus, includeTitles, includeSource }
+                            },
+                            results: results
+                        }, null, 2);
+                        filename += '.json';
+                        break;
+                    
+                    case 'xml':
+                        exportData = '<?xml version="1.0" encoding="UTF-8"?>\n<subdomains>\n';
+                        results.forEach(r => {
+                            exportData += `  <subdomain>\n`;
+                            exportData += `    <host>${r.Host}</host>\n`;
+                            if (includeSource) exportData += `    <source>${r.Source || ''}</source>\n`;
+                            if (includeStatus) exportData += `    <status>${r.Status || ''}</status>\n`;
+                            if (includeTitles) exportData += `    <title><![CDATA[${r.Title || ''}]]></title>\n`;
+                            exportData += `    <url>${r.TriedURL || ''}</url>\n`;
+                            exportData += `  </subdomain>\n`;
+                        });
+                        exportData += '</subdomains>';
+                        filename += '.xml';
+                        break;
+                    
+                    case 'nmap':
+                        exportData = results.map(r => r.Host).join('\n');
+                        filename += '_nmap.txt';
+                        break;
+                    
+                    case 'masscan':
+                        exportData = results.map(r => r.Host).join('\n');
+                        filename += '_masscan.txt';
+                        break;
+                    
+                    case 'burp':
+                        exportData = results.map(r => `*://${r.Host}/*`).join('\n');
+                        filename += '_burp_scope.txt';
+                        break;
+                    
+                    case 'amass':
+                        exportData = `[data_sources]\n[data_sources.passive]\n[data_sources.active]\n\n[scope]\naddress = [${results.map(r => `"${r.Host}"`).join(', ')}]`;
+                        filename += '_amass.ini';
+                        break;
+                }
+
+                this.downloadFile(exportData, filename);
+                this.showNotification(`Exported ${results.length} results as ${format.toUpperCase()}`, 'success');
+            }
+
+            downloadFile(content, filename) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            showModal(data) {
+                document.getElementById('modalTitle').textContent = data.Host;
+                document.getElementById('modalHost').textContent = data.Host;
+                document.getElementById('modalSource').textContent = data.Source || 'Unknown';
+                document.getElementById('modalTriedURL').textContent = data.TriedURL || 'Not probed yet';
+                document.getElementById('modalStatus').textContent = data.Status || 'Probing...';
+                document.getElementById('modalTitleValue').textContent = data.Title || 'No title available';
+                document.getElementById('modalError').textContent = data.Err || 'No errors';
+                
+                document.getElementById('detailModal').style.display = 'block';
+            }
+
+            closeModal() {
+                document.getElementById('detailModal').style.display = 'none';
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }
+
+            // Metrics functionality
+            async loadStatistics() {
+                const display = document.getElementById('metricsDisplay');
+                
+                try {
+                    display.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading statistics...</div>';
+                    
+                    const response = await fetch('/api/stats');
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const stats = await response.json();
+                    this.displayStatistics(stats);
+                    this.showNotification('Statistics loaded successfully', 'success');
+                } catch (error) {
+                    console.error('Failed to load statistics:', error);
+                    display.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--accent-error);">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5; margin-bottom: 1rem;">
+                                <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+                            </svg>
+                            <p>Failed to load statistics</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">${error.message}</p>
                         </div>
-                        <div class="result-details">
-                            <span class="result-status">${status}</span>
-                            <span class="result-title" title="${title}">${title}</span>
+                    `;
+                    this.showNotification('Failed to load statistics', 'error');
+                }
+            }
+
+            displayStatistics(stats) {
+                const display = document.getElementById('metricsDisplay');
+                
+                const formatUptime = (seconds) => {
+                    const days = Math.floor(seconds / 86400);
+                    const hours = Math.floor((seconds % 86400) / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = Math.floor(seconds % 60);
+                    
+                    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+                    if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
+                    if (minutes > 0) return `${minutes}m ${secs}s`;
+                    return `${secs}s`;
+                };
+                
+                const formatDate = (dateString) => {
+                    return new Date(dateString).toLocaleString();
+                };
+                
+                display.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary);">${stats.total_requests || 0}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Total Requests</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary);">${stats.active_jobs || 0}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Active Jobs</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary);">${stats.total_subdomains || 0}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Subdomains Found</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-primary);">${formatUptime(stats.uptime_seconds || 0)}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Uptime</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">System Information</h4>
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 6px; font-size: 0.85rem;">
+                                <div style="margin-bottom: 0.5rem;"><strong>DNS Queries:</strong> ${stats.dns_queries || 0}</div>
+                                <div style="margin-bottom: 0.5rem;"><strong>HTTP Probes:</strong> ${stats.total_probes || 0}</div>
+                                <div style="margin-bottom: 0.5rem;"><strong>Successful Probes:</strong> ${stats.successful_probes || 0}</div>
+                                <div style="margin-bottom: 0.5rem;"><strong>Completed Jobs:</strong> ${stats.completed_jobs || 0}</div>
+                                <div><strong>Failed Jobs:</strong> ${stats.failed_jobs || 0}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">Configuration</h4>
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 6px; font-size: 0.85rem;">
+                                <div style="margin-bottom: 0.5rem;"><strong>DNS Servers:</strong> ${(stats.dns_servers || []).length}</div>
+                                <div style="margin-bottom: 0.5rem;"><strong>Rate Limit:</strong> ${stats.rate_limit || 'N/A'}</div>
+                                <div style="margin-bottom: 0.5rem;"><strong>Last Activity:</strong> ${stats.last_activity ? formatDate(stats.last_activity) : 'N/A'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                        Last updated: ${new Date().toLocaleTimeString()}
+                    </div>
+                `;
+            }
+
+            async viewPrometheusMetrics() {
+                try {
+                    const response = await fetch('/metrics');
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const metrics = await response.text();
+                    
+                    // Open metrics in a new window/tab
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Prometheus Metrics</title>
+                            <style>
+                                body { 
+                                    font-family: 'Courier New', monospace; 
+                                    background: #0a0a0a; 
+                                    color: #ffffff; 
+                                    margin: 20px; 
+                                    line-height: 1.4;
+                                }
+                                .header { 
+                                    color: #4ade80; 
+                                    border-bottom: 2px solid #333; 
+                                    padding-bottom: 10px; 
+                                    margin-bottom: 20px; 
+                                }
+                                pre { 
+                                    background: #111; 
+                                    padding: 20px; 
+                                    border-radius: 8px; 
+                                    border: 1px solid #333; 
+                                    overflow-x: auto; 
+                                }
+                                .metric-line { margin-bottom: 4px; }
+                                .help { color: #888; }
+                                .type { color: #4ade80; }
+                                .metric { color: #ffffff; }
+                            </style>
+                        </head>
+                        <body>
+                            <h1 class="header">Prometheus Metrics</h1>
+                            <pre>${metrics.replace(/\n/g, '<br>')}</pre>
+                        </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                    
+                    this.showNotification('Prometheus metrics opened in new tab', 'success');
+                } catch (error) {
+                    console.error('Failed to load metrics:', error);
+                    this.showNotification('Failed to load Prometheus metrics', 'error');
+                }
+            }
+
+            async checkHealth() {
+                const display = document.getElementById('metricsDisplay');
+                
+                try {
+                    display.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Checking health status...</div>';
+                    
+                    // Check multiple health endpoints
+                    const [healthResponse, readyResponse] = await Promise.all([
+                        fetch('/health').catch(e => ({ ok: false, error: e.message })),
+                        fetch('/ready').catch(e => ({ ok: false, error: e.message }))
+                    ]);
+                    
+                    const healthData = healthResponse.ok ? await healthResponse.json().catch(() => ({})) : {};
+                    const readyData = readyResponse.ok ? await readyResponse.json().catch(() => ({})) : {};
+                    
+                    const healthStatus = healthResponse.ok ? 'Healthy' : 'Unhealthy';
+                    const readyStatus = readyResponse.ok ? (readyData.ready ? 'Ready' : 'Not Ready') : 'Unknown';
+                    
+                    display.innerHTML = `
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">System Health Status</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${healthResponse.ok ? 'var(--accent-primary)' : 'var(--accent-error)'}">${healthStatus}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Health Check</div>
+                                </div>
+                                <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 6px;">
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${readyResponse.ok && readyData.ready ? 'var(--accent-primary)' : 'var(--accent-error)'}">${readyStatus}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Readiness</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: left;">
+                            <h4 style="color: var(--accent-primary); margin-bottom: 0.5rem;">Health Details</h4>
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 6px; font-size: 0.85rem;">
+                                <pre style="margin: 0; white-space: pre-wrap;">${JSON.stringify({
+                                    health: healthData,
+                                    readiness: readyData,
+                                    endpoints: {
+                                        health: healthResponse.ok,
+                                        ready: readyResponse.ok
+                                    }
+                                }, null, 2)}</pre>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                            Checked at: ${new Date().toLocaleTimeString()}
                         </div>
                     `;
                     
-                    // Re-add click listener for modal
-                    existingItem.addEventListener('click', (e) => {
-                        if (e.target.classList.contains('nav-arrow')) return;
-                        this.showModal(newData);
-                    });
+                    const allHealthy = healthResponse.ok && readyResponse.ok;
+                    this.showNotification(
+                        allHealthy ? 'System is healthy and ready' : 'System health check completed with issues',
+                        allHealthy ? 'success' : 'warning'
+                    );
+                } catch (error) {
+                    console.error('Failed to check health:', error);
+                    display.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--accent-error);">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5; margin-bottom: 1rem;">
+                                <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+                            </svg>
+                            <p>Failed to check system health</p>
+                            <p style="font-size: 0.8rem; margin-top: 0.5rem;">${error.message}</p>
+                        </div>
+                    `;
+                    this.showNotification('Failed to check system health', 'error');
+                }
+            }
+
+            async refreshMetrics() {
+                // Check metrics server status
+                this.checkMetricsServerStatus();
+                
+                // If stats are currently displayed, refresh them
+                const display = document.getElementById('metricsDisplay');
+                if (display.innerHTML.includes('Total Requests')) {
+                    this.loadStatistics();
+                } else {
+                    this.showNotification('Metrics refreshed', 'success');
+                }
+            }
+
+            async checkMetricsServerStatus() {
+                const statusElement = document.getElementById('metricsServerStatus');
+                
+                try {
+                    // Check if metrics are available on port 9090
+                    const response = await fetch('http://localhost:9090/', { mode: 'no-cors' });
+                    statusElement.innerHTML = `
+                        <span style="color: var(--accent-primary);">✓ Dedicated metrics server running</span><br>
+                        <a href="http://localhost:9090/" target="_blank" style="color: var(--accent-primary); font-size: 0.8rem;">http://localhost:9090/</a>
+                    `;
+                } catch (error) {
+                    statusElement.innerHTML = `
+                        <span style="color: var(--accent-warning);">⚠ Using main server for metrics</span><br>
+                        <a href="/metrics" target="_blank" style="color: var(--accent-primary); font-size: 0.8rem;">http://localhost:8080/metrics</a>
+                    `;
                 }
             }
         }
 
         // Initialize the scanner when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new AdvancedSubdomainScanner();
+            new EnhancedSubdomainScanner();
         });
     </script>
 </body>

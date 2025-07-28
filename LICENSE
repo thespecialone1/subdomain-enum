@@ -1,0 +1,114 @@
+MIT License
+
+Copyright (c) 2024 Advanced Subdomain Enumeration Tool Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+THIRD-PARTY LICENSES AND ATTRIBUTIONS
+
+This software includes components with the following licenses:
+
+1. Go Programming Language
+   License: BSD-3-Clause
+   Copyright: Google Inc.
+   URL: https://golang.org/LICENSE
+
+2. Miekg DNS Library
+   License: BSD-3-Clause  
+   Copyright: Miek Gieben
+   URL: https://github.com/miekg/dns
+
+3. Web Interface Icons
+   License: MIT
+   Source: Material Design Icons Community
+   URL: https://materialdesignicons.com/
+
+4. Docker Base Images
+   License: Various (see individual image licenses)
+   - distroless/static-debian12: Apache 2.0
+   - golang:alpine: BSD-3-Clause + Alpine packages
+
+SECURITY NOTICE
+
+This tool is designed for legitimate security testing and subdomain enumeration.
+Users are responsible for:
+
+1. Obtaining proper authorization before scanning any domain
+2. Complying with applicable laws and regulations
+3. Respecting robots.txt and rate limiting
+4. Using the tool ethically and responsibly
+
+The authors and contributors are not responsible for any misuse of this software.
+
+EXPORT COMPLIANCE
+
+This software may be subject to export controls. Users are responsible for
+compliance with all applicable export control laws and regulations.
+
+DATA PRIVACY
+
+This tool does not store, transmit, or retain any scanning results permanently.
+All data is processed in memory and discarded when the application terminates.
+Users should be aware that:
+
+1. DNS queries may be logged by DNS providers
+2. HTTP requests may be logged by target servers
+3. API requests are made to third-party services (Wayback Machine, crt.sh)
+
+DISCLAIMER
+
+THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS DISCLAIM ALL
+WARRANTIES, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION
+ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+AND NON-INFRINGEMENT. THE AUTHORS DO NOT WARRANT THAT THE SOFTWARE WILL BE
+ERROR-FREE OR WILL MEET YOUR REQUIREMENTS.
+
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+PROFESSIONAL USE
+
+For commercial or professional use, consider:
+
+1. Implementing additional rate limiting and monitoring
+2. Adding authentication and authorization mechanisms  
+3. Configuring appropriate logging and audit trails
+4. Ensuring compliance with organizational security policies
+5. Regular security updates and vulnerability assessments
+
+COMMUNITY GUIDELINES
+
+Contributors and users are expected to follow the project's code of conduct:
+
+1. Be respectful and inclusive
+2. Focus on constructive feedback
+3. Help maintain a professional environment
+4. Report security issues responsibly
+5. Respect intellectual property rights
+
+For questions about this license or the software, please contact:
+- GitHub Issues: https://github.com/thespecialone1/subdomain-enum/issues
+- Security Issues: security@subdomain-enum.com

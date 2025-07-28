@@ -1,54 +1,386 @@
+# Advanced Subdomain Enumeration Tool v2.2 - .gitignore
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+subdomain-enum*
+!subdomain-enum/  # Allow directory with this name
 
 # Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Output of the go coverage tool
 *.out
+coverage.txt
+coverage.html
+coverage.xml
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Build directories
+dist/
+build/
+bin/
+release/
 
 # Go workspace file
 go.work
+go.work.sum
 
-# IDE files
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go module cache
+go.sum.backup
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+*.sublime-project
 
-# macOS
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs and runtime files
+*.log
+logs/
+tmp/
+temp/
+.tmp/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+config.local.yml
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Docker files (keep main ones, ignore temp/generated)
+docker-compose.override.yml
+.dockerignore.local
+
+# Kubernetes secrets and local configs  
+k8s/secrets/
+kubernetes/local/
+*.kubeconfig
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+database/
+
+# Cache directories
+.cache/
+cache/
+.npm/
+node_modules/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.tmp
+
+# Archive files
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Documentation builds
+docs/_build/
+site/
+_site/
+public/
+
+# Profiling and debugging
+*.prof
+*.pprof
+profile.out
+mem.out
+cpu.out
+debug/
+*.trace
+
+# Testing artifacts
+testdata/output/
+test-results/
+junit.xml
+
+# Monitoring and metrics data
+prometheus_data/
+grafana_data/
+monitoring/data/
+
+# Local development files
+.air.toml.local
+.env.development
+local/
+dev/
+
+# CI/CD artifacts
+.github/secrets/
+deployment/secrets/
+terraform.tfstate*
+*.plan
+
+# Large datasets or wordlists (keep essential ones)
+wordlists/large/
+datasets/
+*.dict
+*.txt.gz
+
+# Performance and load testing
+artillery-report.json
+loadtest-results/
+
+# Certificate and key files
+*.csr
+*.cer
+ca-certificates/
+
+# Build artifacts from various tools
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.msi
+
+# Editor and IDE specific
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/shelf/
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json.example
+!.vscode/launch.json.example
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Vim
+*.swp
+*.swo
+Session.vim
+.netrwhist
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Local configuration overrides
+config.local.json
+config.local.yaml
+settings.local.json
+
+# Runtime and temporary files
+runtime/
+run/
+var/
+*.sock
+
+# Compiled Object files
+*.o
+*.a
+*.lib
+
+# Executables
+*.com
+*.class
+
+# Packages
+*.jar
+*.war
+*.nar
+*.ear
+*.tar
+*.zip
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Node.js (if used for frontend tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Python (if any Python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ruby (if any Ruby scripts)
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+
+# Local Makefile overrides
+Makefile.local
+makefile.local
+
+# Air configuration (keep example)
+.air.toml
+!.air.toml.example
+
+# Local Docker overrides
+docker-compose.local.yml
+docker-compose.dev.yml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# Ansible
+*.retry
+playbooks/host_vars/
+playbooks/group_vars/local/
+
+# Security scanning results
+trivy-results.json
+security-scan-results/
+
+# Load testing results
+k6-results/
+vegeta-results/
+
+# Backup and sync files
+*.bak
+*.swp
+*.tmp
+*~
+.#*
+\#*#
 .DS_Store
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Development databases
+*.sqlite3-journal
+*.db-journal
 
-# Linux
-*~
+# Generated documentation
+api-docs/
+swagger-ui/
 
-# Log files
-*.log
+# Local scripts
+scripts/local/
+bin/local/
 
-# Temporary files
-*.tmp
-*.temp
+# Personal notes and todos
+TODO.md
+NOTES.md
+personal/
 
-# Build artifacts
-/dist/
-/build/
+# Benchmarking results
+benchmarks/
+benchmark-results/
 
-# Compiled binaries
-*.exe
-subdomain-enum-*
+# Memory and CPU profiling
+*.mprof
+*.cprof
 
-# Custom ignore - misc.txt
-misc.txt
+# Code analysis results
+.sonarqube/
+sonar-project.properties.local
+
+# Docker layer cache
+.docker/
+
+# Helm charts development
+charts/*/charts/
+charts/*/requirements.lock
+
+# Grafana dashboard cache
+grafana/dashboards/cache/
+
+# Local certificates for development
+certs/local/
+ssl/dev/

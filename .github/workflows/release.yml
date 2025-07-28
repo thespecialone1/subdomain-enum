@@ -1,0 +1,299 @@
+# .github/workflows/release.yml
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v2.2.0)'
+        required: true
+        default: 'v2.2.0'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build job for multiple platforms
+  build:
+    name: Build Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            suffix: linux-amd64
+          - goos: linux
+            goarch: arm64
+            suffix: linux-arm64
+          - goos: darwin
+            goarch: amd64
+            suffix: darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            suffix: darwin-arm64
+          - goos: windows
+            goarch: amd64
+            suffix: windows-amd64.exe
+          - goos: freebsd
+            goarch: amd64
+            suffix: freebsd-amd64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+        echo "GIT_COMMIT=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        mkdir -p dist
+        go build \
+          -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }} -X main.buildTime=${{ steps.version.outputs.BUILD_TIME }} -X main.gitCommit=${{ steps.version.outputs.GIT_COMMIT }}" \
+          -o dist/subdomain-enum-${{ matrix.suffix }} \
+          cmd/server/main.go
+
+    - name: Create package
+      run: |
+        cd dist
+        if [[ "${{ matrix.goos }}" == "windows" ]]; then
+          zip subdomain-enum-${{ matrix.suffix }}.zip subdomain-enum-${{ matrix.suffix }}
+        else
+          tar -czf subdomain-enum-${{ matrix.suffix }}.tar.gz subdomain-enum-${{ matrix.suffix }}
+        fi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: subdomain-enum-${{ matrix.suffix }}
+        path: dist/subdomain-enum-${{ matrix.suffix }}*
+
+  # Docker build job
+  docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Get version info
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+        echo "GIT_COMMIT=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          BUILD_TIME=${{ steps.version.outputs.BUILD_TIME }}
+          GIT_COMMIT=${{ steps.version.outputs.GIT_COMMIT }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: docker
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Create GitHub release
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build, docker, security]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ./artifacts
+
+    - name: Prepare release assets
+      run: |
+        mkdir -p release
+        find ./artifacts -name "subdomain-enum-*" -type f -exec cp {} release/ \;
+        ls -la release/
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        echo "## 🚀 What's New in v2.2.0" > CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### ✨ New Features" >> CHANGELOG.md
+        echo "- 🐳 **Production-ready Docker support** with multi-stage builds" >> CHANGELOG.md
+        echo "- 📊 **Enhanced metrics and monitoring** with Prometheus integration" >> CHANGELOG.md
+        echo "- 🖥️ **Improved web interface** with professional SVG icons" >> CHANGELOG.md
+        echo "- 🏥 **Advanced health checks** for container deployments" >> CHANGELOG.md
+        echo "- ⚙️ **Comprehensive configuration** via environment variables" >> CHANGELOG.md
+        echo "- 🔄 **Auto-completion detection** prevents infinite refresh loops" >> CHANGELOG.md
+        echo "- 🛡️ **Enhanced security** with rate limiting and input validation" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 🔧 Improvements" >> CHANGELOG.md
+        echo "- Better error handling and graceful stream completion" >> CHANGELOG.md
+        echo "- Optimized DNS resolution with connection pooling" >> CHANGELOG.md
+        echo "- Enhanced logging and debugging capabilities" >> CHANGELOG.md
+        echo "- Multi-architecture Docker images (AMD64, ARM64)" >> CHANGELOG.md
+        echo "- Automated security scanning with Trivy" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 📦 Docker Images" >> CHANGELOG.md
+        echo "- \`ghcr.io/thespecialone1/subdomain-enum:latest\`" >> CHANGELOG.md
+        echo "- \`ghcr.io/thespecialone1/subdomain-enum:v2.2.0\`" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "### 🔗 Quick Start" >> CHANGELOG.md
+        echo "\`\`\`bash" >> CHANGELOG.md
+        echo "# Using Docker" >> CHANGELOG.md
+        echo "docker run -p 8080:8080 ghcr.io/thespecialone1/subdomain-enum:v2.2.0" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "# Using binary" >> CHANGELOG.md
+        echo "wget https://github.com/thespecialone1/subdomain-enum/releases/download/v2.2.0/subdomain-enum-linux-amd64.tar.gz" >> CHANGELOG.md
+        echo "tar -xzf subdomain-enum-linux-amd64.tar.gz" >> CHANGELOG.md
+        echo "./subdomain-enum-linux-amd64" >> CHANGELOG.md
+        echo "\`\`\`" >> CHANGELOG.md
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        body_path: CHANGELOG.md
+        draft: false
+        prerelease: false
+        files: |
+          release/*
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Deploy to staging (optional)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your deployment commands here
+        # e.g., kubectl apply, docker-compose up, etc.
+
+  # Notify on completion
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [release]
+    if: always()
+
+    steps:
+    - name: Notify success
+      if: needs.release.result == 'success'
+      run: |
+        echo "🎉 Release v2.2.0 completed successfully!"
+        echo "📦 Binaries: https://github.com/${{ github.repository }}/releases/latest"
+        echo "🐳 Docker: ghcr.io/${{ github.repository }}:latest"
+
+    - name: Notify failure
+      if: needs.release.result == 'failure'
+      run: |
+        echo "❌ Release failed. Please check the logs."
+        exit 1

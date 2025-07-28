@@ -1,0 +1,103 @@
+# Prometheus configuration for Advanced Subdomain Enumeration Tool v2.2
+
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds
+  evaluation_interval: 15s # Evaluate rules every 15 seconds
+  external_labels:
+    monitor: 'subdomain-enum-monitor'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'
+rule_files:
+  - "alert_rules.yml"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config
+  - job_name: 'subdomain-enum'
+    
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'
+    
+    scrape_interval: 5s
+    metrics_path: /metrics
+    
+    static_configs:
+      - targets: ['subdomain-enum:8080']
+        labels:
+          service: 'subdomain-enum'
+          environment: 'production'
+          
+  # Separate metrics server if running on different port
+  - job_name: 'subdomain-enum-metrics'
+    
+    scrape_interval: 5s
+    metrics_path: /metrics
+    
+    static_configs:
+      - targets: ['subdomain-enum:9090']
+        labels:
+          service: 'subdomain-enum-metrics'
+          environment: 'production'
+
+  # Self-monitoring of Prometheus
+  - job_name: 'prometheus'
+    
+    scrape_interval: 5s
+    
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Node Exporter for system metrics (if deployed)
+  - job_name: 'node'
+    
+    scrape_interval: 15s
+    
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+
+  # cAdvisor for container metrics (if deployed)
+  - job_name: 'cadvisor'
+    
+    scrape_interval: 15s
+    
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'cadvisor'
+
+  # Redis metrics (if cache is enabled)
+  - job_name: 'redis'
+    
+    scrape_interval: 15s
+    
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+
+# Remote write configuration (for long-term storage)
+# remote_write:
+#   - url: "https://your-remote-storage/api/v1/write"
+#     basic_auth:
+#       username: "your-username"
+#       password: "your-password"
+
+# Remote read configuration (for federated queries)
+# remote_read:
+#   - url: "https://your-remote-storage/api/v1/read"
+#     basic_auth:
+#       username: "your-username"
+#       password: "your-password"
