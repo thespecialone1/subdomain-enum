@@ -1,58 +1,85 @@
-# Subdomain Enumerator
+# Advanced Subdomain Enumeration Tool v2.0
 
-A fast and efficient subdomain enumeration tool that discovers subdomains using multiple sources including Wayback Machine and Certificate Transparency logs (crt.sh).
+A comprehensive, high-performance subdomain enumeration platform that discovers subdomains using multiple sources and techniques. Features real-time streaming results, intelligent timeout handling, and an intuitive web interface.
 
-## Features
+## 🚀 New Features v2.0
 
-- 🔍 **Multiple Data Sources**: Queries both Wayback Machine and Certificate Transparency logs
-- 🚀 **Real-time Streaming**: Results appear as they're discovered
-- 🌐 **Web Interface**: Clean, modern web UI for easy usage
-- ⚡ **Fast & Concurrent**: Efficient parallel processing
-- 🔒 **SSL Probe**: Built-in HTTP/HTTPS probing with SSL certificate validation bypass
-- 🛑 **Cancellable Jobs**: Stop running enumeration jobs at any time
+### Multi-Source Discovery
+- **🔍 Wayback Machine**: Historical subdomain discovery from archived web pages
+- **🔒 Certificate Transparency**: Subdomain discovery from SSL/TLS certificate logs (crt.sh)
+- **🌐 DNS Brute Force**: Dictionary-based DNS resolution with 500+ common subdomains
+- **🔎 Search Engine Scraping**: Automated Google search result parsing
+- **🔄 Permutation Generation**: Intelligent subdomain permutation with common patterns
+- **📡 Zone Transfer Attempts**: DNS zone transfer testing (for misconfigured servers)
 
-## Quick Start (No Go Installation Required)
+### Enhanced Interface
+- **⚡ Real-time Streaming**: Results appear instantly as they're discovered
+- **📊 Live Statistics**: Real-time counters and active source monitoring
+- **🎛️ Source Selection**: Enable/disable individual discovery methods
+- **🔍 Advanced Probing**: HTTP/HTTPS status checking with title extraction
+- **📋 Export Options**: Copy results by source or combined
+- **⏱️ Smart Timeouts**: Automatic termination prevents infinite scanning
 
-### Windows Users
-1. Download `subdomain-enum-windows.exe` from the releases
-2. Open Command Prompt or PowerShell
-3. Navigate to the download folder
-4. Run: `subdomain-enum-windows.exe`
-5. Open your browser and go to `http://localhost:8080`
+## Quick Start
 
-### macOS Users
-1. Download `subdomain-enum-macos` from the releases
-2. Open Terminal
-3. Navigate to the download folder
-4. Make it executable: `chmod +x subdomain-enum-macos`
-5. Run: `./subdomain-enum-macos`
-6. Open your browser and go to `http://localhost:8080`
+### Using Pre-built Binaries (Recommended)
 
-### Linux Users
-1. Download `subdomain-enum-linux` from the releases
-2. Open Terminal
-3. Navigate to the download folder
-4. Make it executable: `chmod +x subdomain-enum-linux`
-5. Run: `./subdomain-enum-linux`
-6. Open your browser and go to `http://localhost:8080`
+#### Windows
+```cmd
+# Download the latest release
+curl -L -o subdomain-enum-windows.exe https://github.com/thespecialone1/subdomain-enum/releases/latest/download/subdomain-enum-windows.exe
 
-## How to Use
+# Run the tool
+subdomain-enum-windows.exe
 
-1. **Start the Server**: Run the appropriate executable for your operating system
-2. **Open Web Interface**: Navigate to `http://localhost:8080` in your web browser
-3. **Enter Target Domain**: Type the domain you want to enumerate (e.g., `example.com`)
-4. **Choose Sources**: Select Wayback Machine, crt.sh, or both
-5. **Start Enumeration**: Click the start button and watch results stream in real-time
-6. **Probe Subdomains**: Click on any discovered subdomain to probe its HTTP status and title
+# Open browser and navigate to http://localhost:8080
+```
 
-## Building from Source (For Developers)
+#### macOS
+```bash
+# Download and make executable
+curl -L -o subdomain-enum-macos https://github.com/thespecialone1/subdomain-enum/releases/latest/download/subdomain-enum-macos
+chmod +x subdomain-enum-macos
 
-If you have Go installed and want to build from source:
+# Run the tool
+./subdomain-enum-macos
+
+# Open browser and navigate to http://localhost:8080
+```
+
+#### Linux
+```bash
+# Download and make executable
+curl -L -o subdomain-enum-linux https://github.com/thespecialone1/subdomain-enum/releases/latest/download/subdomain-enum-linux
+chmod +x subdomain-enum-linux
+
+# Run the tool
+./subdomain-enum-linux
+
+# Open browser and navigate to http://localhost:8080
+```
+
+### Using Docker
+
+```bash
+# Build the image
+docker build -t subdomain-enum:v2 .
+
+# Run the container
+docker run -p 8080:8080 subdomain-enum:v2
+
+# Access via http://localhost:8080
+```
+
+### Building from Source
 
 ```bash
 # Clone the repository
 git clone https://github.com/thespecialone1/subdomain-enum.git
 cd subdomain-enum
+
+# Install dependencies
+go mod download
 
 # Run directly
 go run cmd/server/main.go
@@ -61,288 +88,267 @@ go run cmd/server/main.go
 go build -o subdomain-enum cmd/server/main.go
 ```
 
-## Cloud Deployment
+## 📚 Usage Guide
 
-Deploy this application to various cloud platforms:
+### Web Interface
+1. **Start the Server**: Run the executable for your platform
+2. **Open Browser**: Navigate to `http://localhost:8080`
+3. **Configure Sources**: Select which discovery methods to use
+4. **Enter Target**: Input the domain to enumerate (e.g., `example.com`)
+5. **Start Scan**: Click "Start Scan" and watch results stream in real-time
+6. **Review Results**: Click any subdomain for detailed HTTP probe information
+7. **Export Data**: Use "Copy All" buttons to export results
 
-### Render.com
+### Discovery Methods Explained
 
-1. **Fork/Clone** this repository to your GitHub account
-2. **Connect to Render**:
-   - Go to [render.com](https://render.com) and sign up
-   - Click "New" → "Web Service"
-   - Connect your GitHub repository
-3. **Configuration**:
-   - **Name**: `subdomain-enum` (or your preferred name)
-   - **Environment**: `Go`
-   - **Region**: Choose closest to your users
-   - **Branch**: `master` (or `main`)
-   - **Root Directory**: `.` (leave empty or use dot for repository root)
+#### 1. Wayback Machine
+- Searches Internet Archive's historical web crawl data
+- Discovers subdomains from archived URLs
+- Excellent for finding old/deprecated subdomains
+- **Timeout**: 5 minutes
+
+#### 2. Certificate Transparency (crt.sh)
+- Queries public SSL/TLS certificate logs
+- Finds subdomains from certificate Subject Alternative Names
+- Great for discovering active HTTPS subdomains
+- **Timeout**: 5 minutes
+
+#### 3. DNS Brute Force
+- Tests 500+ common subdomain patterns
+- Uses multiple DNS servers (8.8.8.8, 1.1.1.1)
+- Concurrent resolution with rate limiting
+- **Timeout**: 10 minutes
+
+#### 4. Search Engine Scraping
+- Automated Google search with "site:" operator
+- Extracts subdomains from search results
+- Respects search engine rate limits
+- **Timeout**: 5 minutes
+
+#### 5. Permutation Generation
+- Creates intelligent subdomain variations
+- Combines prefixes, suffixes, and patterns
+- Tests common development/staging patterns
+- **Timeout**: 10 minutes
+
+#### 6. Zone Transfer Attempts
+- Tests for DNS zone transfer misconfigurations
+- Attempts AXFR requests against nameservers
+- Rarely successful but worth checking
+- **Timeout**: 2 minutes
+
+## 🌐 Cloud Deployment
+
+### Render.com (Recommended)
+1. Fork this repository to your GitHub account
+2. Connect to [Render.com](https://render.com) and create a new Web Service
+3. Configure settings:
    - **Build Command**: `go build -o main cmd/server/main.go`
    - **Start Command**: `./main`
-   - **Publish Directory**: `.` (leave empty or use dot - this is where your binary will be)
-   - **Instance Type**: `Free` (or upgrade as needed)
-4. **Advanced Settings** (Optional):
-   - **Auto-Deploy**: `Yes` (deploys on every push)
-   - **Environment Variables**: None required (PORT is auto-set)
-5. **Deploy**: Click "Create Web Service"
-
-**Important**: Since your main.go is in `cmd/server/`, make sure the build command points to the correct path. The root directory should be `.` (repository root) so Render can access all files.
+   - **Environment**: Go
+   - **Instance Type**: Free tier supported
 
 ### Railway.app
-
-1. **Connect Repository**:
-   - Go to [railway.app](https://railway.app) and sign up
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Select your forked repository
-2. **Configuration** (Railway auto-detects Go):
-   - **Build Command**: `go build -o main cmd/server/main.go`
-   - **Start Command**: `./main`
-3. **Environment Variables** (if needed):
-   - `PORT`: Railway provides this automatically
-4. **Deploy**: Railway will automatically deploy
+1. Connect repository at [Railway.app](https://railway.app)
+2. Railway auto-detects Go and configures build
+3. Automatic HTTPS and custom domains available
 
 ### Heroku
+```bash
+# Create app and set buildpack
+heroku create your-app-name
+heroku buildpacks:set heroku/go
 
-1. **Install Heroku CLI** and login:
-   ```bash
-   heroku login
-   ```
+# Create Procfile
+echo "web: ./bin/subdomain-enum" > Procfile
 
-2. **Create Heroku app**:
-   ```bash
-   heroku create your-app-name
-   ```
-
-3. **Add Go buildpack**:
-   ```bash
-   heroku buildpacks:set heroku/go
-   ```
-
-4. **Create Procfile** in your project root:
-   ```
-   web: ./bin/subdomain-enum
-   ```
-
-5. **Update go.mod for Heroku** (add this to ensure proper module path):
-   ```bash
-   go mod tidy
-   ```
-
-6. **Deploy**:
-   ```bash
-   git add .
-   git commit -m "Add Heroku deployment config"
-   git push heroku master
-   ```
+# Deploy
+git push heroku main
+```
 
 ### Google Cloud Run
-
-1. **Create Dockerfile** in project root:
-   ```dockerfile
-   # Build stage
-   FROM golang:1.21-alpine AS builder
-   WORKDIR /app
-   COPY go.mod go.sum ./
-   RUN go mod download
-   COPY . .
-   RUN go build -o main cmd/server/main.go
-   
-   # Runtime stage
-   FROM alpine:latest
-   RUN apk --no-cache add ca-certificates
-   WORKDIR /root/
-   COPY --from=builder /app/main .
-   COPY --from=builder /app/public ./public
-   EXPOSE 8080
-   CMD ["./main"]
-   ```
-
-2. **Deploy to Cloud Run**:
-   ```bash
-   gcloud run deploy subdomain-enum \
-     --source . \
-     --platform managed \
-     --region us-central1 \
-     --allow-unauthenticated
-   ```
+```bash
+# Deploy with Cloud Build
+gcloud run deploy subdomain-enum \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+```
 
 ### DigitalOcean App Platform
+- Connect GitHub repository
+- Select Go environment
+- Deploy with automatic scaling
 
-1. **Connect Repository**:
-   - Go to DigitalOcean → Apps → Create App
-   - Connect your GitHub repository
+## 🔧 API Endpoints
 
-2. **App Spec Configuration**:
-   ```yaml
-   name: subdomain-enum
-   services:
-   - name: web
-     source_dir: /
-     github:
-       repo: your-username/subdomain-enum
-       branch: master
-     run_command: ./main
-     build_command: go build -o main cmd/server/main.go
-     environment_slug: go
-     instance_count: 1
-     instance_size_slug: basic-xxs
-     http_port: 8080
-   ```
+### Streaming Endpoints
+- `GET /api/wayback/stream?target=domain.com` - Wayback Machine results
+- `GET /api/crtsh/stream?target=domain.com` - Certificate Transparency results  
+- `GET /api/dns/stream?target=domain.com` - DNS brute force results
+- `GET /api/search/stream?target=domain.com` - Search engine results
+- `GET /api/permute/stream?target=domain.com` - Permutation results
+- `GET /api/zone/stream?target=domain.com` - Zone transfer results
 
-### Fly.io
+### Control Endpoints
+- `GET /api/probe?url=https://subdomain.domain.com` - Probe URL for HTTP status/title
+- `POST /api/abort?target=domain.com` - Cancel all running scans for target
+- `GET /api/status?target=domain.com` - Get scan status and statistics
 
-1. **Install Fly CLI** and login:
-   ```bash
-   flyctl auth login
-   ```
+### Response Formats
 
-2. **Initialize Fly app**:
-   ```bash
-   flyctl launch
-   ```
-
-3. **Update fly.toml** if needed:
-   ```toml
-   [build]
-     builder = "paketobuildpacks/builder:base"
-   
-   [[services]]
-     http_checks = []
-     internal_port = 8080
-     processes = ["app"]
-     protocol = "tcp"
-     script_checks = []
-   
-     [[services.ports]]
-       force_https = true
-       handlers = ["http"]
-       port = 80
-   
-     [[services.ports]]
-       handlers = ["tls", "http"]
-       port = 443
-   ```
-
-4. **Deploy**:
-   ```bash
-   flyctl deploy
-   ```
-
-### Environment Variables for Cloud Deployment
-
-Most cloud platforms will automatically set `PORT`, but you can customize:
-
-- `PORT`: The port your app listens on (default: 8080)
-- `GO_ENV`: Set to `production` for production builds
-
-### Important Notes for Cloud Deployment
-
-1. **Port Configuration**: Most cloud platforms expect your app to listen on the port specified by the `PORT` environment variable. You may need to modify the main.go to use `os.Getenv("PORT")` instead of hardcoded `:8080`.
-
-2. **Static Files**: Ensure the `public/` directory is included in your deployment.
-
-3. **Build Optimization**: For production, consider using build flags:
-   ```bash
-   go build -ldflags="-s -w" -o main cmd/server/main.go
-   ```
-
-4. **Health Checks**: Some platforms require health check endpoints. Consider adding a `/health` endpoint.
-
-### Render-Specific Troubleshooting
-
-**Understanding Render Directory Settings:**
-- **Root Directory**: Where Render starts looking for your code (use `.` for repository root)
-- **Publish Directory**: Where your built binary and assets are located after build (use `.` since binary builds to root)
-
-**Root Directory Issues:**
-- **Problem**: "No such file or directory" errors during build
-- **Solution**: Set Root Directory to `.` (dot) or leave empty
-- **Explanation**: Render needs access to go.mod, cmd/, public/ folders
-
-**Publish Directory Issues:**
-- **Problem**: "Service failed to start" or binary not found
-- **Solution**: Set Publish Directory to `.` (dot) or leave empty
-- **Explanation**: Your binary `main` is built in the root after `go build -o main cmd/server/main.go`
-
-**Build Command Issues:**
-- **Problem**: Build fails with "package not found"
-- **Solution**: Use full path: `go build -o main cmd/server/main.go`
-- **Alternative**: If issues persist, try: `go build -o main ./cmd/server`
-
-**Static Files Not Loading:**
-- **Problem**: Web interface shows "file not found"
-- **Solution**: Ensure `public/` directory is in repository root
-- **Check**: Verify in Render logs that files are copied during build
-
-**Complete Render Settings:**
+#### Stream Response (SSE)
 ```
-Name: subdomain-enum
-Environment: Go
-Build Command: go build -o main cmd/server/main.go
-Start Command: ./main
-Root Directory: . (where your source code is)
-Publish Directory: . (where your built binary will be)
+data: subdomain.example.com
+
+data: api.example.com
+
+data: www.example.com
 ```
 
-### Quick Port Fix for Cloud Deployment
-
-To make your app work with cloud platforms, update the main.go server startup:
-
-```go
-port := os.Getenv("PORT")
-if port == "" {
-    port = "8080"
+#### Probe Response (JSON)
+```json
+{
+  "status": "200",
+  "title": "Example Website",
+  "error": ""
 }
-log.Printf("Listening on port %s...", port)
-log.Fatal(http.ListenAndServe(":"+port, mux))
 ```
 
-### Cross-compilation for Different Platforms
+## ⚙️ Configuration
 
+### Environment Variables
+- `PORT`: Server port (default: 8080)
+- `TIMEOUT_WAYBACK`: Wayback timeout in minutes (default: 5)
+- `TIMEOUT_CRTSH`: Certificate transparency timeout (default: 5)
+- `TIMEOUT_DNS`: DNS brute force timeout (default: 10)
+- `TIMEOUT_SEARCH`: Search engine timeout (default: 5)
+- `TIMEOUT_PERMUTE`: Permutation timeout (default: 10)
+- `TIMEOUT_ZONE`: Zone transfer timeout (default: 2)
+
+### Performance Tuning
+- DNS queries are limited to 50 concurrent requests
+- HTTP probes have 10-second timeouts
+- Search engine queries respect rate limits
+- Memory usage optimized with result streaming
+
+## 🔍 Advanced Usage
+
+### Batch Processing
 ```bash
-# Windows
-GOOS=windows GOARCH=amd64 go build -o subdomain-enum-windows.exe cmd/server/main.go
-
-# macOS
-GOOS=darwin GOARCH=amd64 go build -o subdomain-enum-macos cmd/server/main.go
-
-# Linux
-GOOS=linux GOARCH=amd64 go build -o subdomain-enum-linux cmd/server/main.go
+# Use curl to automate scans
+curl -N "http://localhost:8080/api/wayback/stream?target=example.com" | \
+  while read line; do
+    echo "Found: ${line#data: }"
+  done
 ```
 
-## API Endpoints
+### Custom Wordlists
+The DNS brute force uses a built-in wordlist of 500+ common subdomains. To use custom wordlists, modify the `commonSubdomains` array in `main.go`.
 
-- `GET /` - Web interface
-- `GET /api/wayback/stream?target=domain.com` - Stream subdomains from Wayback Machine
-- `GET /api/crtsh/stream?target=domain.com` - Stream subdomains from Certificate Transparency logs
-- `GET /api/probe?url=https://subdomain.domain.com` - Probe a URL for HTTP status and title
-- `POST /api/abort?target=domain.com` - Cancel running enumeration jobs
+### Rate Limiting
+- Built-in rate limiting prevents API abuse
+- Concurrent DNS queries are limited to prevent flooding
+- HTTP probes include delays between requests
 
-## Configuration
+## 🚨 Security Considerations
 
-The server runs on port 8080 by default. The web interface files should be in a `public/` directory relative to the executable.
+### Ethical Usage
+- Only scan domains you own or have explicit permission to test
+- Respect robots.txt and rate limits
+- Some techniques may trigger security monitoring
 
-## Troubleshooting
+### Firewall Considerations
+- Tool makes outbound HTTPS requests to various APIs
+- DNS queries to 8.8.8.8 and other public resolvers
+- HTTP/HTTPS probes to discovered subdomains
 
-**Port already in use**: If port 8080 is busy, stop other services using that port or modify the source code to use a different port.
+### Privacy
+- No scan data is stored permanently
+- Results are only kept in memory during scan session
+- No tracking or analytics implemented
 
-**Permission denied (macOS/Linux)**: Make sure to run `chmod +x` on the executable file.
+## 📊 Performance Benchmarks
 
-**Antivirus warnings**: Some antivirus software may flag the executable. This is a false positive common with Go binaries.
+### Typical Performance
+- **Small Domain** (< 100 subdomains): 2-5 minutes
+- **Medium Domain** (100-1000 subdomains): 5-15 minutes  
+- **Large Domain** (1000+ subdomains): 15-30 minutes
 
-## Contributing
+### Resource Usage
+- **Memory**: 50-200MB during active scans
+- **CPU**: Low to moderate during DNS brute force
+- **Network**: Moderate outbound traffic for API calls
 
+## 🛠️ Development
+
+### Project Structure
+```
+subdomain-enum/
+├── cmd/server/main.go          # Main application
+├── public/index.html           # Web interface
+├── go.mod                      # Go dependencies
+├── Dockerfile                  # Container configuration
+└── README.md                   # Documentation
+```
+
+### Adding New Sources
+1. Create new stream handler function
+2. Add endpoint registration in main()
+3. Update HTML interface with new source panel
+4. Add JavaScript event handling
+
+### Contributing
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
-## License
+## 🐛 Troubleshooting
 
-This project is open source and available under the MIT License.
+### Common Issues
 
-## Disclaimer
+#### "Port already in use"
+```bash
+# Find process using port 8080
+lsof -i :8080
 
-This tool is for educational and authorized security testing purposes only. Always ensure you have permission before testing domains you don't own.
+# Kill process or use different port
+PORT=8081 ./subdomain-enum
+```
+
+#### "Permission denied" (macOS/Linux)
+```bash
+# Make executable
+chmod +x subdomain-enum-linux
+```
+
+#### "No results found"
+- Verify domain name is correct
+- Check internet connectivity
+- Some APIs may be temporarily unavailable
+- Try different source combinations
+
+#### High CPU usage
+- Normal during DNS brute force phase
+- Reduce concurrent DNS queries in source code if needed
+- Consider running on more powerful hardware
+
+### Debug Mode
+```bash
+# Enable verbose logging
+DEBUG=1 ./subdomain-enum
+```
+
+## 📈 Changelog
+
+### v2.0.0 (Current)
+- ✅ Added DNS brute force enumeration
+- ✅ Added search engine scraping
+- ✅ Added permutation generation  
+- ✅ Added zone transfer attempts
+- ✅ Implemented smart timeouts
+- ✅ Enhanced web interface with source selection
+- ✅ Added real-time statistics

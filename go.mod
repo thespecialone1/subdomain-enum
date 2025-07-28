@@ -2,6 +2,14 @@ module github.com/thespecialone1/subdomain-enum
 
 go 1.24.0
 
-require github.com/electrologue/wayback v0.1.3
+require github.com/miekg/dns v1.1.67
 
-require github.com/google/go-querystring v1.1.0 // indirect
+require (
+	github.com/PuerkitoBio/goquery v1.10.3 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/tools v0.33.0 // indirect
+)
